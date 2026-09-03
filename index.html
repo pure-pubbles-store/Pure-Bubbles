@@ -1,0 +1,1191 @@
+﻿
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pure Bubbles</title>
+    <link rel="icon" type="image/jpeg" href="images/logo.jpg">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            background-image: url('images/bg.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            padding-bottom: 90px;
+            text-align: center;
+        }
+
+        /* الاسم من فوق بخط رقيق جداً */
+        .top-signature {
+            font-size: 11px;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 3px;
+            letter-spacing: 0.8px;
+            font-weight: normal;
+        }
+
+        /* الشريط العلوي الإعلاني */
+        .top-bar {
+            background: linear-gradient(90deg, #8a2be2, #ff007f);
+            color: #ffffff;
+            padding: 8px 15px 10px 15px;
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+            letter-spacing: 0.5px;
+        }
+
+        .main-container {
+            padding: 20px;
+        }
+
+        h1 {
+            color: #8a2be2;
+            margin-bottom: 15px;
+            margin-top: 15px;
+        }
+
+        /* فيديو الهيدر */
+        .header-video-container {
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .header-video {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* شريط البحث */
+        .search-container {
+            max-width: 400px;
+            margin: 0 auto 20px auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #8a2be2;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            font-family: inherit;
+        }
+
+        /* شبكة لعرض الكروت بشكل مرتب */
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        /* شكل كارت المنتج */
+        .card {
+            border: 2px solid #eee;
+            border-radius: 8px;
+            width: 180px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: #fff;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        /* الشارات (Badges) */
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff007f;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 12px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .badge-saving {
+            background: #ff9800;
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 5px;
+            display: block;
+        }
+
+        .card h3 {
+            font-size: 14px;
+            margin: 10px 0 5px;
+            color: #333;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #ff007f;
+            font-weight: bold;
+            margin: 0 0 10px;
+        }
+
+        .btn {
+            background-color: #8a2be2;
+            color: white;
+            border: none;
+            padding: 8px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background-color: #711bb8;
+        }
+
+        /* الأزرار العائمة */
+        .floating-btn {
+            position: fixed;
+            z-index: 1000;
+            border-radius: 50px;
+            padding: 10px 15px;
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            font-size: 13px;
+            border: none;
+            font-family: inherit;
+        }
+
+        .float-cart { bottom: 20px; left: 15px; background: #8a2be2; }
+        .float-wa { bottom: 20px; right: 15px; background: #25d366; }
+        .float-about { bottom: 70px; right: 15px; background: #333; }
+        .float-skin { bottom: 70px; left: 15px; background: #ff007f; }
+
+        /* النوافذ المنبثقة */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: #fff;
+            max-width: 450px;
+            margin: 40px auto;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            text-align: right;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px; left: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .qty-btn {
+            background: #eee;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0 3px;
+        }
+
+        .remove-btn {
+            background: #ff4d4d;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-right: 5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px;
+            margin: 6px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        /* تفاصيل المنتج */
+        .product-detail-img {
+            width: 100%;
+            max-height: 250px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .product-rating {
+            color: #ffb400;
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .product-desc {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+            margin: 15px 0;
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 6px;
+            border-right: 3px solid #8a2be2;
+        }
+
+        /* إشعار إضافة للسلة السريع (Toast) */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #8a2be2;
+            color: #fff;
+            text-align: center;
+            border-radius: 25px;
+            padding: 12px 20px;
+            position: fixed;
+            z-index: 3000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 40px;
+        }
+
+        /* قسم آراء العملاء */
+        .reviews-section {
+            margin-top: 50px;
+            padding: 30px 10px;
+            background: rgba(250, 245, 255, 0.95);
+            border-radius: 12px;
+        }
+
+        .reviews-section h2 {
+            color: #8a2be2;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .reviews-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .review-card {
+            background: #fff;
+            border: 1px solid #e1d5e7;
+            border-radius: 8px;
+            width: 240px;
+            padding: 15px;
+            text-align: right;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .review-card .stars {
+            color: #ffb400;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .review-card p {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+            margin: 5px 0;
+        }
+
+        .review-card .author {
+            font-size: 12px;
+            font-weight: bold;
+            color: #8a2be2;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .cart-notice {
+            background: #fdf2f8;
+            border: 1px solid #fbcfe8;
+            color: #831843;
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            text-align: center;
+            line-height: 1.4;
+            font-weight: bold;
+        }
+
+        /* أزرار تفاعلية لنوع البشرة */
+        .skin-type-btns {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .skin-btn {
+            background: #f0e6ff;
+            color: #8a2be2;
+            border: 1px solid #8a2be2;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .skin-btn.active, .skin-btn:hover {
+            background: #8a2be2;
+            color: white;
+        }
+
+        .recommended-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .rec-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+
+        .rec-item span {
+            font-size: 13px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .rec-item button {
+            background: #ff007f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        /* الفوتر السفلي */
+        .site-footer {
+            margin-top: 40px;
+            padding: 25px 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-top: 2px solid #8a2be2;
+            text-align: center;
+        }
+
+        .footer-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8a2be2;
+            margin-bottom: 6px;
+        }
+
+        .footer-signature {
+            font-size: 16px;
+            font-style: italic;
+            color: #ff007f;
+            font-weight: bold;
+            letter-spacing: 0.8px;
+        }
+
+        /* جعل الكروت 3 في الصف عند فتح الموقع من الموبايل */
+        @media screen and (max-width: 600px) {
+            .main-container {
+                padding: 10px 5px;
+            }
+            .grid-container {
+                gap: 6px;
+            }
+            .card {
+                width: calc(33.333% - 4px);
+                padding: 5px;
+                border-radius: 6px;
+            }
+            .card img {
+                height: 100px;
+            }
+            .card h3 {
+                font-size: 11px;
+                margin: 5px 0 3px;
+                line-height: 1.2;
+            }
+            .card p {
+                font-size: 11px;
+                margin: 0 0 5px;
+            }
+            .badge {
+                font-size: 8px;
+                padding: 2px 4px;
+                top: 5px;
+                right: 5px;
+            }
+            .btn {
+                padding: 5px 2px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div class="top-signature">Lail Eldeeb❣️</div>
+        أسرع توصيل في مصر 🚚 | منتجات طبيعية 100% ✨ | بشرتك تستحق الأفضل 💗
+    </div>
+
+    <div class="main-container">
+
+        <h1>Pure Bubbles</h1>
+
+        <div class="header-video-container">
+            <video class="header-video" autoplay loop muted playsinline>
+                <source src="video.mp4" type="video/mp4">
+                متصفحك لا يدعم تشغيل الفيديو.
+            </video>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="ابحثي عن منتجك المفضل... 🔍" onkeyup="filterProducts()">
+        </div>
+
+        <div class="grid-container" id="productsGrid">
+
+            <div class="card" onclick="openProductDetails('صابونة Signature', 150, 'images/1.jpg', 'ترطيب وتنظيف عميق للبشرة بمكونات خاصة تمنحكِ الانتعاش والنعومة الطويلة.\nتعيد توازن الزيوت الطبيعية في الجلد وتترك ملمساً حريرياً ورائحة فاخرة تدوم طوال اليوم.')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <img src="images/1.jpg" alt="1">
+                <h3>صابونة Signature</h3>
+                <p>150 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة Signature', 150)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة أملاح البحر الميت', 125, 'images/2.jpg', 'تقشر الخلايا الميتة وتعمل على تنشيط الدورة الدموية وتنقّي البشرة.\nغنية بالمعادن الطبيعية النادرة التي تتغلغل داخل المسام لتنظيفها من السموم والترسبات.')">
+                <img src="images/2.jpg" alt="2">
+                <h3>صابونة أملاح البحر الميت</h3>
+                <p>125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة أملاح البحر الميت', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة النيلة الزرقاء', 110, 'images/3.jpg', 'تساعد على تفتيح وتوحيد لون البشرة والتخلص من الآثار الداكنة بشكل طبيعي.\nتعمل على توهج البشرة وتخفيف التصبغات في المناطق المختلفة مع الاستخدام المنتظم.')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <img src="images/3.jpg" alt="3">
+                <h3>صابونة النيلة الزرقاء</h3>
+                <p>110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة النيلة الزرقاء', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة نواة التمر', 125, 'images/4.jpg', 'مغشية بمضادات الأكسدة المغذية للبشرة لتأخير علامات الشيخوخة ونضارة فائقة.\nتساعد في تحفيز الكولاجين وتحسين مرونة الجلد لإطلالة مشدودة وأكثر شباباً.')">
+                <img src="images/4.jpg" alt="4">
+                <h3>صابونة نواة التمر</h3>
+                <p>125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة نواة التمر', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة الأرز بالحليب والعسل', 125, 'images/5.jpg', 'تركيبة فايقة للترطيب الفائق وتفتيح البشرة الحساسة وتغذيتها عميقاً.\nتلطف التهابات الجلد وتمنحه ملمساً ناعماً للغاية مع لمعة صحية وطبيعية.')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <img src="images/5.jpg" alt="5">
+                <h3>صابونة الأرز بالحليب والعسل</h3>
+                <p>125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة الأرز بالحليب والعسل', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة السدر للشعر', 125, 'images/6.jpg', 'تعزز كثافة الشعر وتغذي فروة الرأس وتعمل على تقليل التساقط الطبيعي.\nتقوي البصيلات من الجذور وتمنح الشعر حيوية ولمعاناً مذهلاً دون جفاف.')">
+                <img src="images/6.jpg" alt="6">
+                <h3>صابونة السدر للشعر</h3>
+                <p>125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة السدر للشعر', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة الكريز وزبدة الشيا', 110, 'images/7.jpg', 'ترطيب مضاعف ورائحة كريز منعشة مع تنعيم ملمس الجلد بشكل ملحوظ.\nتقضي على جفاف الجلد الخشن وتمنحه نضارة مخملية وعطراً فاكهاً يدوم سحره.')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <img src="images/7.jpg" alt="7">
+                <h3>صابونة الكريز وزبدة الشيا</h3>
+                <p>110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة الكريز وزبدة الشيا', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة القهوة', 110, 'images/8.jpg', 'تساعد في التخلص من السيلوليت وتقشير الطبقات الميتة لإعطاء ملمس مشدود.\nتنشط الدورة الدموية وتصقل الجلد ليكون أنعم وأكثر تماسكاً مع كل حمام.')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <img src="images/8.jpg" alt="8">
+                <h3>صابونة القهوة</h3>
+                <p>110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة القهوة', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة لبان الدكر', 110, 'images/9.jpg', 'كولاجين طبيعي للبشرة يعزز مرونة الجلد ويقلل من ظهور التجهدات والتجاعيد.\nيساعد في شد مسام البشرة وإخفاء الخطوط الرفيعة لتظهر بشرتك بفرق ملحوظ.')">
+                <img src="images/9.jpg" alt="9">
+                <h3>صابونة لبان الدكر</h3>
+                <p>110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة لبان الدكر', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة الكركم', 110, 'images/10.jpg', 'تساعد في تهدئة الالتهابات ومحاربة البكتيريا وتوحيد لون البشرة.\nمضادة للبكتيريا ومثالية للبشرة التي تعاني من الآثار والبقع الداكنة متكررة الظهور.')">
+                <img src="images/10.jpg" alt="10">
+                <h3>صابونة الكركم</h3>
+                <p>110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة الكركم', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة اللافندر للبيكيني', 110, 'images/11.jpg', 'مخصصة للمناطق الحساسة، تمنحكِ النظافة والانتعاش ورائحة اللافندر المهدئة.\nتركيبة مخصصة فائقة اللطف توازن درجة حموضة الجلد وتمنع التهيج والرائحة غير المرغوبة.')">
+                <img src="images/11.jpg" alt="11">
+                <h3>صابونة اللافندر للبيكيني</h3>
+                <p>110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة اللافندر للبيكيني', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('عنقود العنب (صغير)', 150, 'images/12.jpg', 'تصميم لطيف ورائع بمكونات مغذية وشكل جذاب جداً كهدية أو استخدام شخصي.\nتأتي بتصميم عناقيد مبتكر ومكونات زيوت طبيعية ترطب جسمكِ وتتركه معطراً.')">
+                <img src="images/12.jpg" alt="12">
+                <h3>عنقود العنب (صغير)</h3>
+                <p>150 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('عنقود العنب صغير', 150)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة الألوفيرا', 125, 'images/13.jpg', 'تهدئ البشرة المتهيجة والجافة وتوفر مرطباً طبيعياً ولطيفاً جداً.\nتحتوي على خلاصة الصبار الطبيعي لترطيب أعماق البشرة وتخفيف الاحمرار والجفاف.')">
+                <img src="images/13.jpg" alt="13">
+                <h3>صابونة الألوفيرا</h3>
+                <p>125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة الألوفيرا', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة الفحم النشط', 110, 'images/14.jpg', 'امتصاص الدهون الزائدة وتنقية المسام بفاعلية ممتازة للبشرة الدهنية.\nتساعد في إزالة الرؤوس السوداء والشوائب العميقة وتمنع ظهور الحبوب بفاعلية.')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <img src="images/14.jpg" alt="14">
+                <h3>صابونة الفحم النشط</h3>
+                <p>110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة الفحم النشط', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة العرقسوس', 110, 'images/15.jpg', 'من أجود المكونات الطبيعية للتفتيح السريع والتخلص من التصبغات.\nتُعرف بقدرتها الفائقة على تفتيح الآثار وتوحيد لون البشرة بلمسة لطيفة وآمنة.')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <img src="images/15.jpg" alt="15">
+                <h3>صابونة العرقسوس</h3>
+                <p>110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة العرقسوس', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة جوز الهند والعسل', 110, 'images/16.jpg', 'ترطيب فائق وحماية للبشرة الجافة مع لمسة عطرية دافئة.\nتدمج بين غنى زيت جوز الهند النقية وخصائص العسل المغذية لاستعادة نعومة الجلد.')">
+                <img src="images/16.jpg" alt="16">
+                <h3>صابونة جوز الهند والعسل</h3>
+                <p>110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة جوز الهند والعسل', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('عنقود العنب (كبير)', 200, 'images/17.jpg', 'شكل أنيق بقطعة أكبر لتدوم أطول ومجملة برائحة مميزة وحجم ممتازا.\nتضفي لمسة ديكور لطيفة على حمامكِ وتضمن لكِ استخداماً ممتعاً وممتداً برائحة فواحة.')">
+                <img src="images/17.jpg" alt="17">
+                <h3>عنقود العنب (كبير)</h3>
+                <p>200 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('عنقود العنب كبير', 200)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة تشيز كيك', 200, 'images/18.jpg', 'تصميم مبتكر ورائحة شهية تعطي متعة رائعة في العناية اليومية.\nقطعة فنية تشبه التشيز كيك غنية بالمكونات المرطبة تجعل تجربة الاستحمام مميزة.')">
+                <img src="images/18.jpg" alt="18">
+                <h3>صابونة تشيز كيك</h3>
+                <p>200 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة تشيز كيك', 200)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة كب كيك', 100, 'images/19.jpg', 'قطعة كب كيك لطيفة وممتعة ومغذية بالزيوت المرطبة للبشرة.\nمناسبة جداً كهدية رقيقة أو لإضافة البهجة لروتين العناية اليومية بنعومة فائقة.')">
+                <img src="images/19.jpg" alt="19">
+                <h3>صابونة كب كيك</h3>
+                <p>100 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة كب كيك', 100)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('صابونة ميلك شيك', 100, 'images/20.jpg', 'تصميم لطيف برائحة حليبية ممتازة ولطيفة على الجلد.\nتغذية مركزة ببروتينات الحليب التي تمنح بشرتك نضارة واستعادة سريعة للنعومة.')">
+                <img src="images/20.jpg" alt="20">
+                <h3>صابونة ميلك شيك</h3>
+                <p>100 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة ميلك شيك', 100)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('سكراب الكركم للجسم', 125, 'images/21.jpg', 'يقشر الجلد الميت ويفتح البقع مع الاستمرار لمظهر ناعم ومتوهج.\nيزيل خلايا الجلد الميتة بلطف ويساعد على توحيد لون الجسم وإعادة الإشراقة له.')">
+                <img src="images/21.jpg" alt="21">
+                <h3>سكراب الكركم للجسم</h3>
+                <p>125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('سكراب الكركم للجسم', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('سكراب القهوة للجسم', 125, 'images/22.jpg', 'أفضل مقشر لتحفيز الدورة الدموية ومقاومة السيلوليت والتخلص من خشونة الجلد.\nيحتوي على حبيبات القهوة الطبيعية مع الزيوت المرطبة لإعادة التماسك والمرونة للجلد.')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <img src="images/22.jpg" alt="22">
+                <h3>سكراب القهوة للجسم</h3>
+                <p>125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('سكراب القهوة للجسم', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('سكراب الفحم للجسم', 125, 'images/23.jpg', 'ينظف المسام والجسم بعمق ويتخلص من الشوائب والسموم الجيلدية.\nمثالي للتخلص من حبوب الظهر والجسم وإعطاء شعور بالنظافة المطلقة والتعقيم.')">
+                <img src="images/23.jpg" alt="23">
+                <h3>سكراب الفحم للجسم</h3>
+                <p>125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('سكراب الفحم للجسم', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('سكراب النيلة الزرقاء', 125, 'images/24.jpg', 'مقشر تفتيح قوي ومغذي يمنح الجسم نعومة ملحوظة ونضارة عالية.\nيعمل على سنفرة المناطق الداكنة بالجسم بلطف ومساعدتك في الحصول على لون موحد.')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <img src="images/24.jpg" alt="24">
+                <h3>سكراب النيلة الزرقاء</h3>
+                <p>125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('سكراب النيلة الزرقاء', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('Lip Balm مرطب شفاة', 75, 'images/25.jpg', 'يحمي الشفاه من الجفاف والتشقق مع لمسة لمعان ورائحة منعشة.\nغني بالزيوت الطبيعية وزبدة الشيا لحماية الشفاه طوال اليوم ومنحها مظهراً صحياً.')">
+                <img src="images/25.jpg" alt="25">
+                <h3>Lip Balm مرطب شفاة</h3>
+                <p>75 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Lip Balm مرطب شفاة', 75)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('Lip Scrub مقشر شفاة', 75, 'images/26.jpg', 'يتخلص من الجلد الميت على الشفاة لتبقى ناعمة وموردة دائماً.\nيقشر القشور الجافة بلطف وينشط الدورة الدموية في الشفاه لاستعادة لونها الطبيعي.')">
+                <img src="images/26.jpg" alt="26">
+                <h3>Lip Scrub مقشر شفاة</h3>
+                <p>75 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Lip Scrub مقشر شفاة', 75)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('Sweet Sugar Body Scrub', 100, 'images/27.jpg', 'مقشر السكر اللطيف برائحة سكرية مميزة لترطيب وتنعيم الجسم.\nيجعل حبيبات السكر اللطيفة تنساب على بشرتكِ لتقشير لطيف بدون أي تهيج.')">
+                <img src="images/27.jpg" alt="27">
+                <h3>Sweet Sugar Body Scrub</h3>
+                <p>100 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Sweet Sugar Body Scrub', 100)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('Body Scrub Kandy', 200, 'images/28.jpg', 'مقشر فاخر بتركيبة الغنية بالزيوت العطرية والانتعاش الفائق.\nتجربة فاخرة لتقشير الترطيب بالزيوت المنعشة مع ترك عطر حلو على جسمكِ.')">
+                <img src="images/28.jpg" alt="28">
+                <h3>Body Scrub Kandy</h3>
+                <p>200 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Body Scrub Kandy', 200)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('توينز الكركم', 235, 'images/29.jpg', 'مجموعة توينز الكركم المقشر والصابونة لنتائج تفتيح متكاملة.\nروتين شامل يضمن الحصول على أقصى فائدة للكركم في تنظيف وتوحيد لون البشرة.')">
+                <img src="images/29.jpg" alt="29">
+                <h3>توينز الكركم</h3>
+                <p>235 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('توينز الكركم', 235)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('توينز الفحم', 235, 'images/30.jpg', 'مجموعة توينز الفحم للتنظيف العميق والتخلص من الشوائب كلياً.\nتدمج بين الصابونة والمقشر للوصول إلى أعلى درجات النقاء للمسام والتنظيف الممتاز.')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <img src="images/30.jpg" alt="30">
+                <h3>توينز الفحم</h3>
+                <p>235 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('توينز الفحم', 235)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('توينز القهوة', 235, 'images/31.jpg', 'روتين متكامل من صابونة القهوة والسكراب لتنشيط الدورة الدموية.\nمجموعة حقيقية لمقاومة السيلوليت ونعومة الجسم بخصائص القهوة الفعالة.')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <img src="images/31.jpg" alt="31">
+                <h3>توينز القهوة</h3>
+                <p>235 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('توينز القهوة', 235)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('توينز النيلة الزرقاء', 235, 'images/32.jpg', 'العناية المتكاملة بالنيلة الزرقاء لتفتيح ملحوظ وملمس مخملي.\nثنائي النيلة السحري لصابون وسنفرة البشرة والتخلص الملاحظ من البقع والتصبغات.')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <img src="images/32.jpg" alt="32">
+                <h3>توينز النيلة الزرقاء</h3>
+                <p>235 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('توينز النيلة الزرقاء', 235)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('Pure Glow Box', 500, 'images/33.jpg', 'بوكس متكامل يحتوي على أفضل المنتجات لنضارة وإشراقة لا تقاوم.\nمجموعة مختارة بعناية لمنحكِ تجربة سبا متكاملة في المنزل بسعر موفر للغاية.')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <img src="images/33.jpg" alt="33">
+                <h3>Pure Glow Box</h3>
+                <p>500 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Pure Glow Box', 500)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('عرض 4 Soap Scrub', 500, 'images/34.jpg', 'عرض موفر يحتوي على 4 قطع صابون مقشر بتشكيلات متنوعة.\nتشكيلة رائعة تجمع بين الصابون والمقشر لتجربة جميع روائح وفوائد مجموعتنا.')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <img src="images/34.jpg" alt="34">
+                <h3>عرض 4 Soap Scrub</h3>
+                <p>500 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('عرض 4 Soap Scrub', 500)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('البوكس الجديد (5 صابونات)', 500, 'images/35.jpg', 'توليفة رائعة من 5 صابونات مختارة بعناية لجميع احتياجاتك.\nتنوع متكامل يلبي كافة متطلبات بشرتكِ وشعركِ في مجموعة واحدة توفيرية.')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <img src="images/35.jpg" alt="35">
+                <h3>البوكس الجديد (5 صابونات)</h3>
+                <p>500 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('البوكس الجديد', 500)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('عرض عناقيد العنب (3 عناقيد)', 500, 'images/36.jpg', 'عرض اقتصادي قيم ومميز يحتوي على 3 عناقيد عنب بروائح خيالية.\nمجموعة العناقيد الثلاثية القيمة للترطيب الفائق ورائحة الجسم الساحرة.')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <img src="images/36.jpg" alt="36">
+                <h3>عرض عناقيد العنب (3 عناقيد)</h3>
+                <p>500 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('عرض عناقيد العنب', 500)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('Full Box for Pure Bubbles', 800, 'images/37.jpg', 'المجموعة الشاملة والكاملة لكافة منتجات Pure Bubbles الأكثر مبيعاً.\nالبوكس الفاخر الأكبر الذي يضم المنتجات المفضلة بالكامل لتغطية روتينكِ.')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <img src="images/37.jpg" alt="37">
+                <h3>Full Box for Pure Bubbles</h3>
+                <p>800 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Full Box for Pure Bubbles', 800)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('Soft Rosa Collection', 500, 'images/38.jpg', 'مجموعة الورد اللطيفة بعبير الورد الانثوي الناعم لترطيب فاخر.\nتمنحكِ عبيراً أنثوياً مميزاً وترطيباً حريرياً يجعل بشرتك تتنفس نضارة.')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <img src="images/38.jpg" alt="38">
+                <h3>Soft Rosa Collection</h3>
+                <p>500 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Soft Rosa Collection', 500)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" onclick="openProductDetails('Pure Bubbles Creamy Tint', 75, 'images/39.jpg', 'تنت كريمي طبيعي للشفاة والخدود يمنحكِ مظهر وردي جذاب ودائم.\nتركيبة كريمية سهلة الدمج تمنحكِ حمرة طبيعية وتدوم طوال اليوم دون أن تجف.')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <img src="images/39.jpg" alt="39">
+                <h3>Pure Bubbles Creamy Tint</h3>
+                <p>75 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Pure Bubbles Creamy Tint', 75)">إضافة للسلة 🛍️</button>
+            </div>
+
+        </div>
+
+        <div class="reviews-section">
+            <h2>آراء وترشيحات جميلات Pure Bubbles 💗✨</h2>
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"الصابونة تحفة بجد! ريحة ونعومة من أول استخدام، والنيلة الزرقاء فرقت معايا جداً في التفتيح."</p>
+                    <span class="author">منار ع.</span>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"سكراب القهوة يجنن وبيخلي الجلد ناعم جداً زي الأطفال، والتغليف جميل وأنيق تسلم إيدكم 🌸"</p>
+                    <span class="author">سارة م.</span>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"عرض توينز الفحم خطير للتنظيف، والتنت الكريمي لونه طبيعي وبيدوم طول اليوم.. هطلب تاني أكيد!"</p>
+                    <span class="author">نور إ.</span>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"صابونة Signature تستاهل كل مليم، والمواعيد ممتازة والتوصيل جالي في أسرع وقت. شكراً بيور بابلز!"</p>
+                    <span class="author">أمنية ك.</span>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"صابونة الأرز بالحليب والعسل هدت بشرتي جداً ولطيفة أوي على الوجه، مش بستغنى عنها خلاص 🫧"</p>
+                    <span class="author">ميرنا ح.</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="site-footer">
+        <div class="footer-title">Pure Bubbles Business Account 🫧</div>
+        <div class="footer-signature">Lail Eldeeb❣️</div>
+    </div>
+
+    <div id="toast"></div>
+
+    <button class="floating-btn float-cart" onclick="openModal('cart-modal')">🛍️ السلة (<span id="cart-count">0</span>)</button>
+    <button class="floating-btn float-wa" onclick="openWhatsApp()">💬 واتساب</button>
+    <button class="floating-btn float-about" onclick="openModal('about-modal')">📖 نبذة</button>
+    <button class="floating-btn float-skin" onclick="openModal('skin-modal')">✨ نوع بشرتك</button>
+
+    <div class="modal" id="welcome-modal">
+        <div class="modal-content" style="text-align: center;">
+            <h2 style="color: #8a2be2; margin-bottom: 10px;">أهلاً بكِ في Pure Bubbles 🫧💗</h2>
+            <p style="color: #555; line-height: 1.6; font-size: 14px; margin-bottom: 20px;">
+                منتجات عناية طبيعية 100% صُنعت بكل حب لتمنح بشرتكِ النضارة والانتعاش الذي تستحقينه ✨
+            </p>
+            <button class="btn" style="background: linear-gradient(90deg, #8a2be2, #ff007f); padding: 10px; font-size: 15px;" onclick="closeModal('welcome-modal')">تصفحي المنتجات الآن 🛍️</button>
+        </div>
+    </div>
+
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('product-modal')">&times;</span>
+            <img id="pm-img" src="" alt="product image" class="product-detail-img">
+            <h3 id="pm-title" style="margin:0; color:#8a2be2;"></h3>
+            <div class="product-rating">⭐⭐⭐⭐⭐ (5/5)</div>
+            <p id="pm-price" style="color:#ff007f; font-weight:bold; font-size:16px; margin: 8px 0;"></p>
+            <div id="pm-desc" class="product-desc"></div>
+            <button id="pm-add-btn" class="btn" style="background:#8a2be2; margin-top:10px;">إضافة للسلة 🛍️</button>
+        </div>
+    </div>
+
+    <div class="modal" id="cart-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
+            <h3 style="text-align:center;">سلة المشتريات 🛍️</h3>
+            <div id="cart-items" style="margin: 15px 0;"></div>
+            <h4>الإجمالي: <span id="cart-total">0</span> جنيه</h4>
+            <hr style="margin: 15px 0;">
+            <h4>بيانات التوصيل:</h4>
+            <input type="text" id="c-name" class="form-input" placeholder="الاسم الثنائي (مطلوب)">
+            <input type="tel" id="c-phone" class="form-input" placeholder="رقم الموبايل (مطلوب)">
+            
+            <select id="c-gov" class="form-input" onchange="updateRegions()">
+                <option value="">اختر المحافظة (مطلوب)</option>
+                <option value="القاهرة">القاهرة</option>
+                <option value="الجيزة">الجيزة</option>
+                <option value="الفيوم">الفيوم</option>
+                <option value="الإسكندرية">الإسكندرية</option>
+                <option value="القليوبية">القليوبية</option>
+                <option value="الشرقية">الشرقية</option>
+                <option value="الدقهلية">الدقهلية</option>
+                <option value="البحيرة">البحيرة</option>
+                <option value="المنوفية">المنوفية</option>
+                <option value="الغربية">الغربية</option>
+                <option value="كفر الشيخ">كفر الشيخ</option>
+                <option value="دمياط">دمياط</option>
+                <option value="بورسعيد">بورسعيد</option>
+                <option value="الإسماعيلية">الإسماعيلية</option>
+                <option value="السويس">السويس</option>
+                <option value="بني سويف">بني سويف</option>
+                <option value="المنيا">المنيا</option>
+                <option value="أسيوط">أسيوط</option>
+                <option value="سوهاج">سوهاج</option>
+                <option value="قنا">قنا</option>
+                <option value="الأقصر">الأقصر</option>
+                <option value="أسوان">أسوان</option>
+                <option value="مطروح">مطروح</option>
+                <option value="البحر الأحمر">البحر الأحمر</option>
+                <option value="الوادي الجديد">الوادي الجديد</option>
+                <option value="شمال سيناء">شمال سيناء</option>
+                <option value="جنوب سيناء">جنوب سيناء</option>
+            </select>
+
+            <select id="c-region" class="form-input">
+                <option value="">اختر المنطقة/المركز (برجاء اختيار المحافظة أولاً)</option>
+            </select>
+
+            <textarea id="c-address" class="form-input" placeholder="العنوان بالتفصيل (الشارع، رقم العمائر/ الشقة)"></textarea>
+            
+            <div class="cart-notice">
+                سيتم التواصل خلال ٢٤ ساعة لتاكيد الاوردر والشحن نورتني بيور بابلز 💗
+            </div>
+
+            <button class="btn" style="background:#25d366; margin-top:10px;" onclick="checkout()">إرسال الطلب عبر واتساب</button>
+        </div>
+    </div>
+
+    <div class="modal" id="about-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('about-modal')">&times;</span>
+            <h3 style="text-align:center;">عن Pure Bubbles 🫧💗</h3>
+            <p style="line-height: 1.6; color: #444; font-size: 14px;">
+                مرحبًا بكِ في عالم Pure Bubbles 🫧💗<br><br>
+                في Pure Bubbles بنؤمن إن العناية بالنفس مش رفاهية، دي لحظة صغيرة تستحقيها كل يوم.<br><br>
+                بدأنا بحب وشغف علشان نقدم لكِ منتجات عناية مصنوعة بعناية، تجمع بين المكونات المختارة، الروائح الجميلة، والأشكال المميزة اللي تخلي روتينك اليومي أحلى. ✨
+            </p>
+        </div>
+    </div>
+
+    <div class="modal" id="skin-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('skin-modal')">&times;</span>
+            <h3 style="text-align:center; margin-bottom:15px;">اكتشفي المناسب لبشرتك ✨</h3>
+            <p style="text-align:center; font-size:13px; color:#666;">اختاري نوع بشرتك لعرض الصابون المقترح والمناسب فوراً:</p>
+            
+            <div class="skin-type-btns">
+                <button class="skin-btn active" onclick="showSkinRec('dry', this)">الجافة 🌵</button>
+                <button class="skin-btn" onclick="showSkinRec('oily', this)">الدهنية 💧</button>
+                <button class="skin-btn" onclick="showSkinRec('sensitive', this)">الحساسة 🌸</button>
+            </div>
+
+            <div id="skin-recommendations" class="recommended-cards">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var cart = [];
+
+        // إظهار نافذة الترحيب فور فتح الموقع
+        window.onload = function() {
+            openModal('welcome-modal');
+        };
+
+        var regionsData = {
+            "القاهرة": ["مدينة نصر", "مصر الجديدة", "التجمع الخامس / القاهرة الجديدة", "المعادي", "الزمالك", "وسط البلد", "حلوان", "المقطم", "الرحاب", "مدينتي", "الزيتون", "عين شمس", "شبرا"],
+            "الجيزة": ["الدقي", "المهندسين", "الشيخ زايد", "6 أكتوبر", "الهرم", "فيصل", "حدائق الأهرام", "حدائق أكتوبر", "العجوزة", "إمبابة", "الجيزة مركز"],
+            "الفيوم": ["مدينة الفيوم", "سنورس", "طامية", "إطسا", "أبشواي", "يوسف الصديق"],
+            "الإسكندرية": ["سموحة", "ميامي", "المنتزه", "جليم", "ستانلي", "العجمي", "محرم بك", "سيدي بشر", "العامرة"],
+            "القليوبية": ["بنها", "شبرا الخيمة", "العبور", "الخانكة", "قليوب", "طوخ"],
+            "الشرقية": ["الزقازيق", "العاشر من رمضان", "بلبيس", "منيا القمح", "فاووس"],
+            "الدقهلية": ["المنصورة", "طلخا", "ميت غمر", "دكرنس", "سنبلاوين"],
+            "البحيرة": ["دمنهور", "كفر الدوار", "إيتاي البارود", "كوم حمادة"],
+            "المنوفية": ["شبين الكوم", "منوف", "أشمون", "قويسنا", "السادات"],
+            "الغربية": ["طنطا", "المحلة الكبرى", "زفتى", "سمنود"],
+            "كفر الشيخ": ["كفر الشيخ", "دسوق", "بلطيم"],
+            "دمياط": ["دمياط", "دمياط الجديدة", "رأس البر"],
+            "بورسعيد": ["حي الشرق", "حي المناخ", "حي الزهور", "بورفؤاد"],
+            "الإسماعيلية": ["مدينة الإسماعيلية", "القنطرة", "القصاصين"],
+            "السويس": ["حي السويس", "حي الأربعين", "حي الفيصل"],
+            "بني سويف": ["بني سويف", "الواسطى", "ببا"],
+            "المنيا": ["المنيا", "ملوي", "السمالوط"],
+            "أسيوط": ["أسيوط", "ديروط", "القوصية"],
+            "سوهاج": ["سوهاج", "أخميم", "طهطا"],
+            "قنا": ["قنا", "نجع حمادي", "قوص"],
+            "الأقصر": ["مدينة الأقصر", "إسنا", "أرمنت"],
+            "أسوان": ["مدينة أسوان", "كوم أمبو", "إدفو"],
+            "مطروح": ["مرسى مطروح", "العلمين", "الضبعة"],
+            "البحر الأحمر": ["الغردقة", "سفاجا", "القصير"],
+            "الوادي الجديد": ["الخارجة", "الداخلة"],
+            "شمال سيناء": ["العريش"],
+            "جنوب سيناء": ["شرم الشيخ", "دهب", "طور سيناء"]
+        };
+
+        var skinData = {
+            dry: [
+                { name: "صابونة الكريز وزبدة الشيا", price: 110 },
+                { name: "صابونة الأرز بالحليب والعسل", price: 125 },
+                { name: "صابونة جوز الهند والعسل", price: 110 },
+                { name: "صابونة الألوفيرا", price: 125 }
+            ],
+            oily: [
+                { name: "صابونة الفحم النشط", price: 110 },
+                { name: "صابونة القهوة", price: 110 },
+                { name: "صابونة نواة التمر", price: 125 },
+                { name: "صابونة لبان الدكر", price: 110 }
+            ],
+            sensitive: [
+                { name: "صابونة العرقسوس", price: 110 },
+                { name: "صابونة الكركم", price: 110 },
+                { name: "صابونة Signature", price: 150 },
+                { name: "صابونة جوز الهند والعسل", price: 110 }
+            ]
+        };
+
+        function showToast(message) {
+            var toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.className = "show";
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 2500);
+        }
+
+        function filterProducts() {
+            var input = document.getElementById('searchInput').value.toLowerCase();
+            var cards = document.querySelectorAll('#productsGrid .card');
+            
+            cards.forEach(function(card) {
+                var title = card.querySelector('h3').innerText.toLowerCase();
+                if (title.includes(input)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        function updateRegions() {
+            var gov = document.getElementById('c-gov').value;
+            var regionSelect = document.getElementById('c-region');
+            regionSelect.innerHTML = '<option value="">اختر المنطقة/المركز</option>';
+
+            if (gov && regionsData[gov]) {
+                regionsData[gov].forEach(function(region) {
+                    var opt = document.createElement('option');
+                    opt.value = region;
+                    opt.innerText = region;
+                    regionSelect.appendChild(opt);
+                });
+            } else {
+                regionSelect.innerHTML = '<option value="">اختر المنطقة/المركز (برجاء اختيار المحافظة أولاً)</option>';
+            }
+        }
+
+        function showSkinRec(type, btnElem) {
+            if(btnElem) {
+                var btns = document.querySelectorAll('.skin-btn');
+                btns.forEach(b => b.classList.remove('active'));
+                btnElem.classList.add('active');
+            }
+
+            var container = document.getElementById('skin-recommendations');
+            var list = skinData[type];
+            var html = "";
+
+            list.forEach(function(item) {
+                html += '<div class="rec-item">' +
+                        '<span>' + item.name + ' (' + item.price + ' ج)</span>' +
+                        '<button onclick="addToCart(\'' + item.name + '\', ' + item.price + ')">إضافة للسلة 🛍️</button>' +
+                        '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function addToCart(name, price) {
+            var exist = cart.find(x => x.name === name);
+            if (exist) {
+                exist.qty++;
+            } else {
+                cart.push({ name: name, price: price, qty: 1 });
+            }
+            updateCart();
+            showToast("تم إضافة " + name + " إلى السلة بنجاح! ✨");
+        }
+
+        function openProductDetails(name, price, imgSrc, desc) {
+            document.getElementById('pm-title').innerText = name;
+            document.getElementById('pm-price').innerText = price + " جنيه";
+            document.getElementById('pm-img').src = imgSrc;
+            document.getElementById('pm-desc').innerText = desc;
+            document.getElementById('pm-add-btn').onclick = function() {
+                addToCart(name, price);
+                closeModal('product-modal');
+            };
+            openModal('product-modal');
+        }
+
+        function changeQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        function updateCart() {
+            var count = 0;
+            var total = 0;
+            var html = "";
+
+            cart.forEach(function(item, index) {
+                count += item.qty;
+                total += item.price * item.qty;
+                html += '<div class="cart-item">' +
+                        '<div><button class="remove-btn" onclick="removeFromCart(' + index + ')">❌</button> ' +
+                        '<span>' + item.name + '</span></div>' +
+                        '<div>' +
+                        '<button class="qty-btn" onclick="changeQty(' + index + ', -1)">-</button>' +
+                        '<span style="margin: 0 4px;">' + item.qty + '</span>' +
+                        '<button class="qty-btn" onclick="changeQty(' + index + ', 1)">+</button>' +
+                        '<span style="margin-right: 8px;">' + (item.price * item.qty) + ' ج</span>' +
+                        '</div></div>';
+            });
+
+            document.getElementById('cart-count').innerText = count;
+            document.getElementById('cart-total').innerText = total;
+            document.getElementById('cart-items').innerHTML = html || "<p style='text-align:center; color:#888;'>السلة فارغة حالياً</p>";
+        }
+
+        function checkout() {
+            var name = document.getElementById('c-name').value;
+            var phone = document.getElementById('c-phone').value;
+            var gov = document.getElementById('c-gov').value;
+            var region = document.getElementById('c-region').value;
+            var address = document.getElementById('c-address').value;
+
+            if (!name || !phone || !gov || !address) {
+                alert("برجاء إدخال كافة البيانات المطلوب إكمالها (الاسم، المحافظة، العنوان).");
+                return;
+            }
+
+            if (cart.length === 0) {
+                alert("السلة فارغة!");
+                return;
+            }
+
+            var fullLoc = gov + (region ? (" - " + region) : "");
+            var msg = "طلب جديد من Pure Bubbles 🫧\n\nالاسم: " + name + "\nالرقم: " + phone + "\nالمحافظة والمنطقة: " + fullLoc + "\nالعنوان التفصيلي: " + address + "\n\nالطلبات:\n";
+            var total = 0;
+            cart.forEach(function(item) {
+                msg += "- " + item.name + " (" + item.qty + ")\n";
+                total += item.price * item.qty;
+            });
+            msg += "\nالإجمالي: " + total + " جنيه";
+
+            window.open("https://wa.me/201021432610?text=" + encodeURIComponent(msg), "_blank");
+        }
+
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'block'; 
+            if(id === 'skin-modal') {
+                showSkinRec('dry', document.querySelector('.skin-btn'));
+            }
+        }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function openWhatsApp() { window.open("https://wa.me/201021432610", "_blank"); }
+    </script>
+
+</body>
+</html>
