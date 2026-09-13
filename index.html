@@ -1,0 +1,2187 @@
+﻿
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pure Bubbles</title>
+    <link rel="icon" type="image/jpeg" href="images/logo.jpg">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* إخفاء الأسهم والسكريول الخارجي للشاشة */
+        html, body {
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            background-image: url('images/bg.jpg');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            padding-bottom: 90px;
+            text-align: center;
+        }
+
+        /* تنسيق السعر المشطوب */
+        .old-price {
+            text-decoration: line-through;
+            color: #888;
+            font-size: 12px;
+            margin-left: 5px;
+            font-weight: normal;
+        }
+
+        .top-signature {
+            font-size: 11px;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 3px;
+            letter-spacing: 0.8px;
+            font-weight: normal;
+        }
+
+        .top-bar {
+            background: linear-gradient(90deg, #8a2be2, #ff007f);
+            color: #ffffff;
+            padding: 8px 15px 10px 15px;
+            font-size: 13px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .main-container {
+            padding: 20px;
+        }
+
+        h1 {
+            color: #8a2be2;
+            margin-bottom: 15px;
+            margin-top: 15px;
+        }
+
+        .header-video-container {
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .header-video {
+            width: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        .search-container {
+            max-width: 400px;
+            margin: 0 auto 20px auto;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #8a2be2;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            box-sizing: border-box;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            font-family: inherit;
+        }
+
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .section-header-title {
+            width: 100%;
+            margin: 30px 0 15px 0;
+            color: #8a2be2;
+            font-size: 22px;
+            font-weight: bold;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 12px;
+            border-radius: 10px;
+            border-right: 5px solid #ff007f;
+            border-left: 5px solid #8a2be2;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-sizing: border-box;
+        }
+
+        .card {
+            border: 2px solid #eee;
+            border-radius: 8px;
+            width: 180px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            background: #fff;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        .badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff007f;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 3px 8px;
+            border-radius: 12px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .badge-saving {
+            background: #ff9800;
+        }
+
+        /* علامة الزائد للأدمن على كل كارت منتج */
+        .admin-card-plus-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #25d366;
+            color: white;
+            border: 2px solid #fff;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 5px;
+            display: block;
+        }
+
+        .card h3 {
+            font-size: 14px;
+            margin: 10px 0 5px;
+            color: #333;
+        }
+
+        .card p {
+            font-size: 14px;
+            color: #ff007f;
+            font-weight: bold;
+            margin: 0 0 10px;
+        }
+
+        .btn {
+            background-color: #8a2be2;
+            color: white;
+            border: none;
+            padding: 8px;
+            width: 100%;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background-color: #711bb8;
+        }
+
+        .floating-btn {
+            position: fixed;
+            z-index: 1000;
+            border-radius: 50px;
+            padding: 10px 15px;
+            color: #fff;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            font-size: 13px;
+            border: none;
+            font-family: inherit;
+        }
+
+        .float-cart { bottom: 20px; left: 15px; background: #8a2be2; }
+        .float-wa { bottom: 20px; right: 15px; background: #25d366; }
+        .float-skin { bottom: 70px; left: 15px; background: #ff007f; position: fixed; }
+
+        .admin-skin-plus {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #25d366;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .menu-toggle-btn {
+            background: transparent;
+            border: 2px solid #fff;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .side-drawer {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 280px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+            z-index: 3000;
+            transition: right 0.3s ease;
+            overflow-y: auto;
+            text-align: right;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .side-drawer.open {
+            right: 0;
+        }
+
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f0e6ff;
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+        }
+
+        .drawer-header h3 {
+            color: #8a2be2;
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .drawer-close {
+            font-size: 22px;
+            cursor: pointer;
+            color: #ff007f;
+            font-weight: bold;
+        }
+
+        .drawer-item {
+            background: #faf5ff;
+            color: #8a2be2;
+            border: 1px solid #d8b4fe;
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+
+        .drawer-item:hover {
+            background: #8a2be2;
+            color: #fff;
+        }
+
+        .sub-categories-container {
+            display: none;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 10px;
+            padding-right: 15px;
+        }
+
+        .sub-cat-item {
+            background: #fff;
+            color: #555;
+            border: 1px solid #eee;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: right;
+            transition: all 0.2s;
+        }
+
+        .sub-cat-item:hover {
+            background: #ff007f;
+            color: #fff;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            z-index: 4000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: #fff;
+            max-width: 450px;
+            margin: 40px auto;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+            text-align: right;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px; left: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .qty-btn {
+            background: #eee;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0 3px;
+        }
+
+        .remove-btn {
+            background: #ff4d4d;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 11px;
+            margin-right: 5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 8px;
+            margin: 6px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #8a2be2;
+            color: #fff;
+            text-align: center;
+            border-radius: 25px;
+            padding: 12px 20px;
+            position: fixed;
+            z-index: 5000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 40px;
+        }
+
+        .reviews-section {
+            margin-top: 50px;
+            padding: 30px 10px;
+            background: rgba(250, 245, 255, 0.95);
+            border-radius: 12px;
+        }
+
+        .reviews-section h2 {
+            color: #8a2be2;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .reviews-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .review-card {
+            background: #fff;
+            border: 1px solid #e1d5e7;
+            border-radius: 8px;
+            width: 240px;
+            padding: 15px;
+            text-align: right;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .review-card .stars {
+            color: #ffb400;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .review-card p {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+            margin: 5px 0;
+        }
+
+        .review-card .author {
+            font-size: 12px;
+            font-weight: bold;
+            color: #8a2be2;
+            margin-top: 8px;
+            display: block;
+        }
+
+        .cart-notice {
+            background: #fdf2f8;
+            border: 1px solid #fbcfe8;
+            color: #831843;
+            font-size: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            text-align: center;
+            line-height: 1.4;
+            font-weight: bold;
+        }
+
+        .skin-type-btns {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .skin-btn {
+            background: #f0e6ff;
+            color: #8a2be2;
+            border: 1px solid #8a2be2;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .skin-btn.active, .skin-btn:hover {
+            background: #8a2be2;
+            color: white;
+        }
+
+        .recommended-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .rec-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #eee;
+        }
+
+        .rec-item span {
+            font-size: 13px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .rec-item button {
+            background: #ff007f;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .tint-color-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .tint-color-btn:hover {
+            transform: scale(1.03);
+        }
+
+        .site-footer {
+            margin-top: 40px;
+            padding: 25px 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border-top: 2px solid #8a2be2;
+            text-align: center;
+        }
+
+        .footer-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8a2be2;
+            margin-bottom: 6px;
+        }
+
+        .footer-signature {
+            font-size: 16px;
+            font-style: italic;
+            color: #ff007f;
+            font-weight: bold;
+            letter-spacing: 0.8px;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .admin-table th, .admin-table td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            text-align: center;
+        }
+        .admin-table th {
+            background-color: #8a2be2;
+            color: white;
+        }
+
+        @media screen and (max-width: 600px) {
+            .main-container {
+                padding: 10px 5px;
+            }
+            .grid-container {
+                gap: 10px;
+            }
+            .card {
+                width: calc(50% - 5px);
+                padding: 8px;
+                border-radius: 8px;
+            }
+            .card img {
+                height: 140px;
+            }
+            .card h3 {
+                font-size: 12px;
+                margin: 6px 0 4px;
+                line-height: 1.3;
+            }
+            .card p {
+                font-size: 12px;
+                margin: 0 0 6px;
+            }
+            .badge {
+                font-size: 9px;
+                padding: 2px 5px;
+                top: 6px;
+                right: 6px;
+            }
+            .btn {
+                padding: 6px 4px;
+                font-size: 11px;
+            }
+            .section-header-title {
+                font-size: 17px;
+                padding: 10px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <div>
+            <div class="top-signature">Lail Eldeeb❣️</div>
+            أسرع توصيل في مصر 🚚 | منتجات طبيعية 100% ✨ | بشرتك تستحق الأفضل 💗
+        </div>
+        <button class="menu-toggle-btn" onclick="toggleSideDrawer()">☰</button>
+    </div>
+
+    <!-- الصفحة الجانبية المنسدلة -->
+    <div class="side-drawer" id="sideDrawer">
+        <div class="drawer-header">
+            <h3>قائمة الاختيارات 🫧</h3>
+            <span class="drawer-close" onclick="toggleSideDrawer()">&times;</span>
+        </div>
+
+        <div class="drawer-item" onclick="toggleSubCategories()">
+            <span>📁 الأقسام</span>
+            <span id="sub-arrow">▼</span>
+        </div>
+        <div class="sub-categories-container" id="subCategoriesList">
+            <div class="sub-cat-item" onclick="filterByCategory('body')">عناية للجسم 🧴</div>
+            <div class="sub-cat-item" onclick="filterByCategory('hair')">عناية للشعر 🌿</div>
+            <div class="sub-cat-item" onclick="filterByCategory('face')">عناية للبشرة ✨</div>
+            <div class="sub-cat-item" onclick="filterByCategory('scrubs')">الاسكربات 🫧</div>
+        </div>
+
+        <div class="drawer-item" onclick="toggleSideDrawer(); openModal('track-modal')">
+            <span>📦 تتبع طلبك</span>
+        </div>
+
+        <div class="drawer-item" onclick="toggleSideDrawer(); authAdmin()">
+            <span>🔐 الادمن</span>
+        </div>
+
+        <div class="drawer-item" onclick="toggleSideDrawer(); openModal('about-modal')">
+            <span>📖 نبذه</span>
+        </div>
+
+        <div class="drawer-item" onclick="toggleSideDrawer(); resetCategoryFilter();">
+            <span>🫧 جميع المنتجات</span>
+        </div>
+
+        <div class="drawer-item" onclick="toggleSideDrawer(); scrollToSection('offers-section')">
+            <span>🎁 عروض التوفير</span>
+        </div>
+
+        <div class="drawer-item" onclick="toggleSideDrawer(); scrollToSection('reviews-section')">
+            <span>⭐ اراء العملا</span>
+        </div>
+    </div>
+
+    <div class="main-container">
+
+        <h1>Pure Bubbles</h1>
+
+        <div class="header-video-container">
+            <video class="header-video" autoplay loop muted playsinline webkit-playsinline>
+                <source src="video.mp4" type="video/mp4">
+                متصفحك لا يدعم تشغيل الفيديو.
+            </video>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="ابحثي عن منتجك المفضل... 🔍" onkeyup="filterProducts()">
+        </div>
+
+        <div class="grid-container" id="productsGrid">
+
+            <div class="card" id="card-1" data-id="static-1" data-category="face" onclick="openProductDetails('static-1')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-1')">+</button>
+                <img src="images/1.jpg" alt="1" loading="lazy">
+                <h3>صابونة Signature</h3>
+                <p><span class="old-price">200 جنيه</span> 150 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة Signature', 150)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-2" data-id="static-2" data-category="body" onclick="openProductDetails('static-2')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-2')">+</button>
+                <img src="images/2.jpg" alt="2" loading="lazy">
+                <h3>صابونة أملاح البحر الميت</h3>
+                <p><span class="old-price">170 جنيه</span> 125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة أملاح البحر الميت', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-3" data-id="static-3" data-category="body" onclick="openProductDetails('static-3')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-3')">+</button>
+                <img src="images/3.jpg" alt="3" loading="lazy">
+                <h3>صابونة النيلة الزرقاء</h3>
+                <p><span class="old-price">150 جنيه</span> 110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة النيلة الزرقاء', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-4" data-id="static-4" data-category="hair" onclick="openProductDetails('static-4')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-4')">+</button>
+                <img src="images/4.jpg" alt="4" loading="lazy">
+                <h3>صابونة نواة التمر</h3>
+                <p><span class="old-price">165 جنيه</span> 125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة نواة التمر', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-5" data-id="static-5" data-category="face" onclick="openProductDetails('static-5')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-5')">+</button>
+                <img src="images/5.jpg" alt="5" loading="lazy">
+                <h3>صابونة الأرز بالحليب والعسل</h3>
+                <p><span class="old-price">165 جنيه</span> 125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة الأرز بالحليب والعسل', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-6" data-id="static-6" data-category="hair" onclick="openProductDetails('static-6')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-6')">+</button>
+                <img src="images/6.jpg" alt="6" loading="lazy">
+                <h3>صابونة السدر للشعر</h3>
+                <p><span class="old-price">165 جنيه</span> 125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة السدر للشعر', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-7" data-id="static-7" data-category="body" onclick="openProductDetails('static-7')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-7')">+</button>
+                <img src="images/7.jpg" alt="7" loading="lazy">
+                <h3>صابونة الكريز وزبدة الشيا</h3>
+                <p><span class="old-price">150 جنيه</span> 110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة الكريز وزبدة الشيا', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-8" data-id="static-8" data-category="body" onclick="openProductDetails('static-8')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-8')">+</button>
+                <img src="images/8.jpg" alt="8" loading="lazy">
+                <h3>صابونة القهوة</h3>
+                <p><span class="old-price">150 جنيه</span> 110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة القهوة', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-9" data-id="static-9" data-category="face" onclick="openProductDetails('static-9')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-9')">+</button>
+                <img src="images/9.jpg" alt="9" loading="lazy">
+                <h3>صابونة لبان الدكر</h3>
+                <p><span class="old-price">150 جنيه</span> 110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة لبان الدكر', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-10" data-id="static-10" data-category="face" onclick="openProductDetails('static-10')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-10')">+</button>
+                <img src="images/10.jpg" alt="10" loading="lazy">
+                <h3>صابونة الكركم</h3>
+                <p><span class="old-price">150 جنيه</span> 110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة الكركم', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-11" data-id="static-11" data-category="body" onclick="openProductDetails('static-11')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-11')">+</button>
+                <img src="images/11.jpg" alt="11" loading="lazy">
+                <h3>صابونة اللافندر للبيكيني</h3>
+                <p><span class="old-price">150 جنيه</span> 110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة اللافندر للبيكيني', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-12" data-id="static-12" data-category="body" onclick="openProductDetails('static-12')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-12')">+</button>
+                <img src="images/12.jpg" alt="12" loading="lazy">
+                <h3>عنقود العنب (صغير)</h3>
+                <p><span class="old-price">190 جنيه</span> 150 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('عنقود العنب صغير', 150)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-13" data-id="static-13" data-category="face" onclick="openProductDetails('static-13')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-13')">+</button>
+                <img src="images/13.jpg" alt="13" loading="lazy">
+                <h3>صابونة الألوفيرا</h3>
+                <p><span class="old-price">165 جنيه</span> 125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة الألوفيرا', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-14" data-id="static-14" data-category="face" onclick="openProductDetails('static-14')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-14')">+</button>
+                <img src="images/14.jpg" alt="14" loading="lazy">
+                <h3>صابونة الفحم النشط</h3>
+                <p><span class="old-price">150 جنيه</span> 110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة الفحم النشط', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-15" data-id="static-15" data-category="face" onclick="openProductDetails('static-15')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-15')">+</button>
+                <img src="images/15.jpg" alt="15" loading="lazy">
+                <h3>صابونة العرقسوس</h3>
+                <p><span class="old-price">150 جنيه</span> 110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة العرقسوس', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-16" data-id="static-16" data-category="face" onclick="openProductDetails('static-16')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-16')">+</button>
+                <img src="images/16.jpg" alt="16" loading="lazy">
+                <h3>صابونة جوز الهند والعسل</h3>
+                <p><span class="old-price">150 جنيه</span> 110 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة جوز الهند والعسل', 110)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-17" data-id="static-17" data-category="body" onclick="openProductDetails('static-17')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-17')">+</button>
+                <img src="images/17.jpg" alt="17" loading="lazy">
+                <h3>عنقود العنب (كبير)</h3>
+                <p><span class="old-price">260 جنيه</span> 200 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('عنقود العنب كبير', 200)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-18" data-id="static-18" data-category="body" onclick="openProductDetails('static-18')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-18')">+</button>
+                <img src="images/18.jpg" alt="18" loading="lazy">
+                <h3>صابونة تشيز كيك</h3>
+                <p><span class="old-price">250 جنيه</span> 200 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة تشيز كيك', 200)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-19" data-id="static-19" data-category="body" onclick="openProductDetails('static-19')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-19')">+</button>
+                <img src="images/19.jpg" alt="19" loading="lazy">
+                <h3>صابونة كب كيك</h3>
+                <p><span class="old-price">130 جنيه</span> 100 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة كب كيك', 100)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-20" data-id="static-20" data-category="body" onclick="openProductDetails('static-20')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-20')">+</button>
+                <img src="images/20.jpg" alt="20" loading="lazy">
+                <h3>صابونة ميلك شيك</h3>
+                <p><span class="old-price">130 جنيه</span> 100 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('صابونة ميلك شيك', 100)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-21" data-id="static-21" data-category="scrubs" onclick="openProductDetails('static-21')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-21')">+</button>
+                <img src="images/21.jpg" alt="21" loading="lazy">
+                <h3>سكراب الكركم للجسم</h3>
+                <p><span class="old-price">160 جنيه</span> 125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('سكراب الكركم للجسم', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-22" data-id="static-22" data-category="scrubs" onclick="openProductDetails('static-22')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-22')">+</button>
+                <img src="images/22.jpg" alt="22" loading="lazy">
+                <h3>سكراب القهوة للجسم</h3>
+                <p><span class="old-price">160 جنيه</span> 125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('سكراب القهوة للجسم', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-23" data-id="static-23" data-category="scrubs" onclick="openProductDetails('static-23')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-23')">+</button>
+                <img src="images/23.jpg" alt="23" loading="lazy">
+                <h3>سكراب الفحم للجسم</h3>
+                <p><span class="old-price">160 جنيه</span> 125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('سكراب الفحم للجسم', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-24" data-id="static-24" data-category="scrubs" onclick="openProductDetails('static-24')">
+                <span class="badge">✨ الأكثر مبيعاً</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-24')">+</button>
+                <img src="images/24.jpg" alt="24" loading="lazy">
+                <h3>سكراب النيلة الزرقاء</h3>
+                <p><span class="old-price">160 جنيه</span> 125 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('سكراب النيلة الزرقاء', 125)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-25" data-id="static-25" data-category="face" onclick="openProductDetails('static-25')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-25')">+</button>
+                <img src="images/25.jpg" alt="25" loading="lazy">
+                <h3>Lip Balm مرطب شفاة</h3>
+                <p><span class="old-price">100 جنيه</span> 75 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Lip Balm مرطب شفاة', 75)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-26" data-id="static-26" data-category="face" onclick="openProductDetails('static-26')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-26')">+</button>
+                <img src="images/26.jpg" alt="26" loading="lazy">
+                <h3>Lip Scrub مقشر شفاة</h3>
+                <p><span class="old-price">100 جنيه</span> 75 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Lip Scrub مقشر شفاة', 75)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-27" data-id="static-27" data-category="scrubs" onclick="openProductDetails('static-27')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-27')">+</button>
+                <img src="images/27.jpg" alt="27" loading="lazy">
+                <h3>Sweet Sugar Body Scrub</h3>
+                <p><span class="old-price">140 جنيه</span> 100 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Sweet Sugar Body Scrub', 100)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-28" data-id="static-28" data-category="scrubs" onclick="openProductDetails('static-28')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-28')">+</button>
+                <img src="images/28.jpg" alt="28" loading="lazy">
+                <h3>Body Scrub Kandy</h3>
+                <p><span class="old-price">260 جنيه</span> 200 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Body Scrub Kandy', 200)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="section-header-title" id="offers-section">
+                🎁 عروض بوكسات التوفير حصرية 🔥
+            </div>
+
+            <div class="card" id="card-29" data-id="static-29" data-category="scrubs" onclick="openProductDetails('static-29')">
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-29')">+</button>
+                <img src="images/29.jpg" alt="29" loading="lazy">
+                <h3>توينز الكركم</h3>
+                <p><span class="old-price">310 جنيه</span> 235 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('توينز الكركم', 235)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-30" data-id="static-30" data-category="scrubs" onclick="openProductDetails('static-30')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-30')">+</button>
+                <img src="images/30.jpg" alt="30" loading="lazy">
+                <h3>توينز الفحم</h3>
+                <p><span class="old-price">310 جنيه</span> 235 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('توينز الفحم', 235)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-31" data-id="static-31" data-category="scrubs" onclick="openProductDetails('static-31')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-31')">+</button>
+                <img src="images/31.jpg" alt="31" loading="lazy">
+                <h3>توينز القهوة</h3>
+                <p><span class="old-price">310 جنيه</span> 235 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('توينز القهوة', 235)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-32" data-id="static-32" data-category="scrubs" onclick="openProductDetails('static-32')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-32')">+</button>
+                <img src="images/32.jpg" alt="32" loading="lazy">
+                <h3>توينز النيلة الزرقاء</h3>
+                <p><span class="old-price">310 جنيه</span> 235 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('توينز النيلة الزرقاء', 235)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-33" data-id="static-33" onclick="openProductDetails('static-33')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-33')">+</button>
+                <img src="images/33.jpg" alt="33" loading="lazy">
+                <h3>Pure Glow Box</h3>
+                <p><span class="old-price">650 جنيه</span> 500 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Pure Glow Box', 500)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-34" data-id="static-34" onclick="openProductDetails('static-34')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-34')">+</button>
+                <img src="images/34.jpg" alt="34" loading="lazy">
+                <h3>عرض 4 Soap Scrub</h3>
+                <p><span class="old-price">640 جنيه</span> 500 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('عرض 4 Soap Scrub', 500)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-35" data-id="static-35" onclick="openProductDetails('static-35')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-35')">+</button>
+                <img src="images/35.jpg" alt="35" loading="lazy">
+                <h3>البوكس الجديد (5 صابونات)</h3>
+                <p><span class="old-price">625 جنيه</span> 500 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('البوكس الجديد', 500)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-36" data-id="static-36" onclick="openProductDetails('static-36')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-36')">+</button>
+                <img src="images/36.jpg" alt="36" loading="lazy">
+                <h3>عرض عناقيد العنب (3 عناقيد)</h3>
+                <p><span class="old-price">600 جنيه</span> 500 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('عرض عناقيد العنب', 500)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-37" data-id="static-37" onclick="openProductDetails('static-37')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-37')">+</button>
+                <img src="images/37.jpg" alt="37" loading="lazy">
+                <h3>Full Box for Pure Bubbles</h3>
+                <p><span class="old-price">1050 جنيه</span> 800 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Full Box for Pure Bubbles', 800)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-38" data-id="static-38" onclick="openProductDetails('static-38')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-38')">+</button>
+                <img src="images/38.jpg" alt="38" loading="lazy">
+                <h3>Soft Rosa Collection</h3>
+                <p><span class="old-price">650 جنيه</span> 500 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Soft Rosa Collection', 500)">إضافة للسلة 🛍️</button>
+            </div>
+
+            <div class="card" id="card-39" data-id="static-39" onclick="openProductDetails('static-39')">
+                <span class="badge badge-saving">⭐ عرض التوفير</span>
+                <button class="admin-card-plus-btn" style="display:none;" onclick="event.stopPropagation(); openAdminEditCardModal('static-39')">+</button>
+                <img src="images/39.jpg" alt="39" loading="lazy">
+                <h3>Pure Bubbles Creamy Tint</h3>
+                <p><span class="old-price">110 جنيه</span> 75 جنيه</p>
+                <button class="btn" onclick="event.stopPropagation(); addToCart('Pure Bubbles Creamy Tint', 75)">إضافة للسلة 🛍️</button>
+            </div>
+
+        </div>
+
+        <div class="grid-container" id="dynamicProductsGrid" style="margin-top: 15px;"></div>
+
+        <div class="reviews-section" id="reviews-section">
+            <h2>آراء وترشيحات جميلات Pure Bubbles 💗✨</h2>
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"الصابونة تحفة بجد! ريحة ونعومة من أول استخدام، والنيلة الزرقاء فرقت معايا جداً في التفتيح."</p>
+                    <span class="author">منار ع.</span>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"سكراب القهوة يجنن وبيخلي الجلد ناعم جداً زي الأطفال، والتغليف جميل وأنيق تسلم إيدكم 🌸"</p>
+                    <span class="author">سارة م.</span>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"عرض توينز الفحم خطير للتنظيف، والتنت الكريمي لونه طبيعي وبيدوم طول اليوم.. هطلب تاني أكيد!"</p>
+                    <span class="author">نور إ.</span>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"صابونة Signature تستاهل كل مليم، والمواعيد ممتازة والتوصيل جالي في أسرع وقت. شكراً بيور بابلز!"</p>
+                    <span class="author">أمنية ك.</span>
+                </div>
+                <div class="review-card">
+                    <div class="stars">⭐⭐⭐⭐⭐</div>
+                    <p>"صابونة الأرز بالحليب والعسل هدت بشرتي جداً ولطيفة أوي على الوجه، مش بستغنى عنها خلاص 🫧"</p>
+                    <span class="author">ميرنا ح.</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="site-footer">
+        <div class="footer-title">Pure Bubbles Business Account 🫧</div>
+        <div class="footer-signature">Lail Eldeeb❣️</div>
+    </div>
+
+    <div id="toast"></div>
+
+    <button class="floating-btn float-cart" onclick="openModal('cart-modal')">🛍️ السلة (<span id="cart-count">0</span>)</button>
+    <button class="floating-btn float-wa" onclick="openWhatsApp()">💬 واتساب</button>
+    
+    <button class="floating-btn float-skin" onclick="openModal('skin-modal')">
+        ✨ نوع بشرتك
+        <span id="admin-skin-plus-icon" class="admin-skin-plus" style="display:none;" onclick="event.stopPropagation(); openAddSkinProductModal()">+</span>
+    </button>
+
+    <!-- مودال تعديل المنتج للأدمن المباشر من الكارت -->
+    <div class="modal" id="admin-edit-card-modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <span class="close-btn" onclick="closeModal('admin-edit-card-modal')">&times;</span>
+            <h3 style="color:#8a2be2; text-align:center;">تعديل تفاصيل الكارت 👑</h3>
+            
+            <input type="hidden" id="edit-card-id">
+
+            <label style="font-size:12px; font-weight:bold;">اسم المنتج:</label>
+            <input type="text" id="edit-p-title" class="form-input">
+
+            <label style="font-size:12px; font-weight:bold;">السعر الجديد:</label>
+            <input type="number" id="edit-p-price" class="form-input">
+
+            <label style="font-size:12px; font-weight:bold;">السعر القديم (اختياري):</label>
+            <input type="number" id="edit-p-old-price" class="form-input">
+
+            <label style="font-size:12px; font-weight:bold;">الشاره في الركن:</label>
+            <input type="text" id="edit-p-badge" class="form-input">
+
+            <label style="font-size:12px; font-weight:bold;">اختر الصورة الرئيسية الأولى (من المعرض):</label>
+            <input type="file" id="edit-p-img1-file" class="form-input" accept="image/*">
+
+            <label style="font-size:12px; font-weight:bold;">اختر الصورة التانية (من المعرض):</label>
+            <input type="file" id="edit-p-img2-file" class="form-input" accept="image/*">
+
+            <label style="font-size:12px; font-weight:bold;">اختر الصورة التالته والأخيرة (من المعرض):</label>
+            <input type="file" id="edit-p-img3-file" class="form-input" accept="image/*">
+
+            <label style="font-size:12px; font-weight:bold;">شرح المنتج:</label>
+            <textarea id="edit-p-desc" class="form-input" style="height: 70px;"></textarea>
+
+            <button class="btn" style="background:#25d366; margin-top:10px;" onclick="saveCardEdit()">حفظ التعديل الى الموقع</button>
+        </div>
+    </div>
+
+    <!-- مودال إضافة منتج لنوع البشرة -->
+    <div class="modal" id="admin-add-skin-modal">
+        <div class="modal-content" style="max-width: 380px;">
+            <span class="close-btn" onclick="closeModal('admin-add-skin-modal')">&times;</span>
+            <h3 style="color:#8a2be2; text-align:center;">إضافة منتج لنوع البشرة 🌿</h3>
+            
+            <label style="font-size:12px; font-weight:bold;">اختر قسم البشرة:</label>
+            <select id="skin-target-type" class="form-input">
+                <option value="dry">الجافة 🌵</option>
+                <option value="oily">الدهنية 💧</option>
+                <option value="sensitive">الحساسة 🌸</option>
+            </select>
+
+            <label style="font-size:12px; font-weight:bold;">اسم المنتج:</label>
+            <input type="text" id="skin-new-name" class="form-input" placeholder="اسم المنتج...">
+
+            <label style="font-size:12px; font-weight:bold;">السعر (جنيه):</label>
+            <input type="number" id="skin-new-price" class="form-input" placeholder="السعر...">
+
+            <button class="btn" style="background:#25d366; margin-top:10px;" onclick="saveSkinNewProduct()">إضافة المنتج 🛍️</button>
+        </div>
+    </div>
+
+    <!-- بقية المودالات الأساسية -->
+    <div class="modal" id="welcome-modal">
+        <div class="modal-content" style="text-align: center;">
+            <h2 style="color: #8a2be2; margin-bottom: 10px;">أهلاً بكِ في Pure Bubbles 🫧💗</h2>
+            <p style="color: #555; line-height: 1.6; font-size: 14px; margin-bottom: 20px;">
+                منتجات عناية طبيعية 100% صُنعت بكل حب لتمنح بشرتكِ النضارة والانتعاش الذي تستحقينه ✨
+            </p>
+            <button class="btn" style="background: linear-gradient(90deg, #8a2be2, #ff007f); padding: 10px; font-size: 15px;" onclick="closeModal('welcome-modal')">تصفحي المنتجات الآن 🛍️</button>
+        </div>
+    </div>
+
+    <div class="modal" id="tint-modal">
+        <div class="modal-content" style="text-align: center; max-width: 380px;">
+            <span class="close-btn" onclick="closeModal('tint-modal')">&times;</span>
+            <h3 style="color: #8a2be2; margin-bottom: 8px;">اختاري لون التنت ✨</h3>
+            <p style="color: #666; font-size: 13px; margin-bottom: 20px;">برجاء اختيار اللون المفضل للـ Tint قبل الإضافة للسلة:</p>
+            
+            <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 15px;">
+                <button class="tint-color-btn" style="background-color: #ffe6e6; border-color: #ff3333; color: #cc0000;" onclick="confirmTintChoice('أحمر')">❤️ أحمر</button>
+                <button class="tint-color-btn" style="background-color: #ffe6f2; border-color: #ff66b2; color: #cc0066;" onclick="confirmTintChoice('بينك')">🩷 بينك</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="cart-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('cart-modal')">&times;</span>
+            <h3 style="text-align:center;">سلة المشتريات 🛍️</h3>
+            <div id="cart-items" style="margin: 15px 0;"></div>
+            <h4>الإجمالي: <span id="cart-total">0</span> جنيه</h4>
+            <hr style="margin: 15px 0;">
+            <h4>بيانات التوصيل:</h4>
+            <input type="text" id="c-name" class="form-input" placeholder="الاسم الثنائي (مطلوب)" required>
+            <input type="tel" id="c-phone" class="form-input" placeholder="رقم الموبايل (مطلوب)" required>
+            
+            <select id="c-gov" class="form-input" onchange="updateRegions()" required>
+                <option value="">اختر المحافظة (مطلوب)</option>
+                <option value="القاهرة">القاهرة</option>
+                <option value="الجيزة">الجيزة</option>
+                <option value="الفيوم">الفيوم</option>
+                <option value="الإسكندرية">الإسكندرية</option>
+                <option value="القليوبية">القليوبية</option>
+                <option value="الشرقية">الشرقية</option>
+                <option value="الدقهلية">الدقهلية</option>
+                <option value="البحيرة">البحيرة</option>
+                <option value="المنوفية">المنوفية</option>
+                <option value="الغربية">الغربية</option>
+                <option value="كفر الشيخ">كفر الشيخ</option>
+                <option value="دمياط">دمياط</option>
+                <option value="بورسعيد">بورسعيد</option>
+                <option value="الإسماعيلية">الإسماعيلية</option>
+                <option value="السويس">السويس</option>
+                <option value="بني سويف">بني سويف</option>
+                <option value="المنيا">المنيا</option>
+                <option value="أسيوط">أسيوط</option>
+                <option value="سوهاج">سوهاج</option>
+                <option value="قنا">قنا</option>
+                <option value="الأقصر">الأقصر</option>
+                <option value="أسوان">أسوان</option>
+                <option value="مطروح">مطروح</option>
+                <option value="البحر الأحمر">البحر الأحمر</option>
+                <option value="الوادي الجديد">الوادي الجديد</option>
+                <option value="شمال سيناء">شمال سيناء</option>
+                <option value="جنوب سيناء">جنوب سيناء</option>
+            </select>
+
+            <select id="c-region" class="form-input">
+                <option value="">اختر المنطقة/المركز (برجاء اختيار المحافظة أولاً)</option>
+            </select>
+
+            <textarea id="c-address" class="form-input" placeholder="العنوان بالتفصيل (الشارع، رقم العمائر/ الشقة)" required></textarea>
+            
+            <div class="cart-notice">
+                سيتم التواصل خلال ٢٤ ساعة لتاكيد الاوردر والشحن نورتني بيور بابلز 💗
+            </div>
+
+            <button class="btn" style="background:#25d366; margin-top:10px;" onclick="checkout()">إرسال الطلب عبر واتساب</button>
+        </div>
+    </div>
+
+    <div class="modal" id="about-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('about-modal')">&times;</span>
+            <h3 style="text-align:center;">عن Pure Bubbles 🫧💗</h3>
+            <p style="line-height: 1.6; color: #444; font-size: 14px;">
+                مرحبًا بكِ في عالم Pure Bubbles 🫧💗<br><br>
+                في Pure Bubbles بنؤمن إن العناية بالنفس مش رفاهية، دي لحظة صغيرة تستحقيها كل يوم.<br><br>
+                بدأنا بحب وشغف علشان نقدم لكِ منتجات عناية مصنوعة بعناية، تجمع بين المكونات المختارة، الروائح الجميلة، والأشكال المميزة اللي تخلي روتينك اليومي أحلى. ✨
+            </p>
+        </div>
+    </div>
+
+    <div class="modal" id="skin-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('skin-modal')">&times;</span>
+            <h3 style="text-align:center; margin-bottom:15px;">اكتشفي المناسب لبشرتك ✨</h3>
+            <p style="text-align:center; font-size:13px; color:#666;">اختاري نوع بشرتك لعرض الصابون المقترح والمناسب فوراً:</p>
+            
+            <div class="skin-type-btns">
+                <button class="skin-btn active" onclick="showSkinRec('dry', this)">الجافة 🌵</button>
+                <button class="skin-btn" onclick="showSkinRec('oily', this)">الدهنية 💧</button>
+                <button class="skin-btn" onclick="showSkinRec('sensitive', this)">الحساسة 🌸</button>
+            </div>
+
+            <div id="skin-recommendations" class="recommended-cards"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="track-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('track-modal')">&times;</span>
+            <h3 style="text-align:center; color:#8a2be2;">تتبع حالة طلبك 📦</h3>
+            <p style="font-size:12px; color:#666; text-align:center;">أدخلي كود التتبع الخاص بكِ (مثال: PB-8492)</p>
+            <input type="text" id="track-code-input" class="form-input" placeholder="كود التتبع...">
+            <button class="btn" style="margin-top:10px;" onclick="trackOrder()">استعلام عن حالة الطلب</button>
+            <div id="track-result" style="margin-top:15px; padding:10px; font-weight:bold; text-align:center;"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="admin-modal">
+        <div class="modal-content" style="max-width: 650px;">
+            <span class="close-btn" onclick="closeModal('admin-modal')">&times;</span>
+            <h2 style="text-align:center; color:#8a2be2;">لوحة تحكم الأدمن 👑</h2>
+            
+            <div style="display:flex; justify-content:center; gap:10px; margin-bottom:15px;">
+                <button class="btn" onclick="showAdminTab('orders')" style="background:#8a2be2;">إدارة الطلبات والتتبع</button>
+                <button class="btn" onclick="showAdminTab('products')" style="background:#ff007f;">إدارة المنتجات</button>
+            </div>
+
+            <div id="admin-orders-tab">
+                <h3>جدول جميع الطلبات (مرتبة بالأكواد والأسماء)</h3>
+                <div style="overflow-x:auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>كود التتبع</th>
+                                <th>اسم العميلة</th>
+                                <th>الهاتف</th>
+                                <th>الإجمالي</th>
+                                <th>الحالة الحالية</th>
+                                <th>تغيير الحالة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="admin-products-tab" style="display:none;">
+                <h3>إضافة منتج جديد</h3>
+                <input type="text" id="p-title" class="form-input" placeholder="اسم المنتج">
+                <input type="number" id="p-price" class="form-input" placeholder="السعر الجديد">
+                <input type="number" id="p-old-price" class="form-input" placeholder="السعر القديم (اختياري)">
+                
+                <label style="font-size:12px; font-weight:bold;">الصورة الأولى (الرئيسية):</label>
+                <input type="file" id="p-img1-file" class="form-input" accept="image/*">
+                <label style="font-size:12px; font-weight:bold;">الصورة الثانية:</label>
+                <input type="file" id="p-img2-file" class="form-input" accept="image/*">
+                <label style="font-size:12px; font-weight:bold;">الصورة الثالثة:</label>
+                <input type="file" id="p-img3-file" class="form-input" accept="image/*">
+                
+                <textarea id="p-desc" class="form-input" placeholder="وصف المنتج"></textarea>
+                <input type="text" id="p-badge" class="form-input" placeholder="الوسام (مثال: ✨ الأكثر مبيعاً)">
+                <button class="btn" style="background:#25d366; margin-top:5px;" onclick="addNewProductFromFiles()">إضافة المنتج للموقع</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://tyhdolhaqvizusuzdjox.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5aGRvbGhhcXZpenVzdXpkam94Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEyMzg2MjAsImV4cCI6MjA1NjzgNDYyMH0.J1P5mYpS3kI-W9mH1o2p3q4r5s6t7u8v9w0x1y2z3a4";
+        var _supabase = null;
+        if(window.supabase) {
+            _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+
+        var cart = [];
+        var pendingTintPrice = 75;
+
+        var productsDetailsDb = JSON.parse(localStorage.getItem('pure_products_db')) || {
+            "static-1": { title: "صابونة Signature", price: 150, oldPrice: 200, badge: "✨ الأكثر مبيعاً", images: ["images/1.jpg", "", ""], desc: "ترطيب وتنظيف عميق للبشرة بمكونات خاصة تمنحكِ الانتعاش والنعومة الطويلة.\nتعيد توازن الزيوت الطبيعية في الجلد وتترك ملمساً حريرياً ورائحة فاخرة تدوم طوال اليوم." },
+            "static-2": { title: "صابونة أملاح البحر الميت", price: 125, oldPrice: 170, badge: "", images: ["images/2.jpg", "", ""], desc: "تقشر الخلايا الميتة وتعمل على تنشيط الدورة الدموية وتنقّي البشرة.\nغنية بالمعادن الطبيعية النادرة التي تتغلغل داخل المسام لتنظيفها من السموم والترسبات." },
+            "static-3": { title: "صابونة النيلة الزرقاء", price: 110, oldPrice: 150, badge: "✨ الأكثر مبيعاً", images: ["images/3.jpg", "", ""], desc: "تساعد على تفتيح وتوحيد لون البشرة والتخلص من الآثار الداكنة بشكل طبيعي.\nتععمل على توهج البشرة وتخفيف التصبغات في المناطق المختلفة مع الاستخدام المنتظم." },
+            "static-4": { title: "صابونة نواة التمر", price: 125, oldPrice: 165, badge: "", images: ["images/4.jpg", "", ""], desc: "مغشية بمضادات الأكسدة المغذية للبشرة لتأخير علامات الشيخوخة ونضارة فائقة.\nتساعد في تحفيز الكولاجين وتحسين مرونة الجلد لإطلالة مشدودة وأكثر شباباً." },
+            "static-5": { title: "صابونة الأرز بالحليب والعسل", price: 125, oldPrice: 165, badge: "✨ الأكثر مبيعاً", images: ["images/5.jpg", "", ""], desc: "تركيبة فايقة للترطيب الفائق وتفتيح البشرة الحساسة وتغذيتها عميقاً.\nتلطف التهابات الجلد وتمنحه ملمساً ناعماً للغاية مع لمعة صحية وطبيعية." },
+            "static-6": { title: "صابونة السدر للشعر", price: 125, oldPrice: 165, badge: "", images: ["images/6.jpg", "", ""], desc: "تعزز كثافة الشعر وتغذي فروة الرأس وتعمل على تقليل التساقط الطبيعي.\nتقوي البصيلات من الجذور وتمنح الشعر حيوية ولمعاناً مذهلاً دون جفاف." },
+            "static-7": { title: "صابونة الكريز وزبدة الشيا", price: 110, oldPrice: 150, badge: "✨ الأكثر مبيعاً", images: ["images/7.jpg", "", ""], desc: "ترطيب مضاعف ورائحة كريز منعشة مع تنعيم ملمس الجلد بشكل ملحوظ.\nتقضي على جفاف الجلد الخشن وتمنحه نضارة مخملية وعطراً فاكهاً يدوم سحره." },
+            "static-8": { title: "صابونة القهوة", price: 110, oldPrice: 150, badge: "✨ الأكثر مبيعاً", images: ["images/8.jpg", "", ""], desc: "تساعد في التخلص من السيلوليت وتقشير الطبقات الميتة لإعطاء ملمس مشدود.\nتنشط الدورة الدموية وتصقل الجلد ليكون أنعم وأكثر تماسكاً مع كل حمام." },
+            "static-9": { title: "صابونة لبان الدكر", price: 110, oldPrice: 150, badge: "", images: ["images/9.jpg", "", ""], desc: "كولاجين طبيعي للبشرة يعزز مرونة الجلد ويقلل من ظهور التجهدات والتجاعيد.\nيساعد في شد مسام البشرة وإخفاء الخطوط الرفيعة لتظهر بشرتك بفرق ملحوظ." },
+            "static-10": { title: "صابونة الكركم", price: 110, oldPrice: 150, badge: "", images: ["images/10.jpg", "", ""], desc: "تساعد في تهدئة الالتهابات ومحاربة البكتيريا وتوحيد لون البشرة.\nمضادة للبكتيريا ومثالية للبشرة التي تعاني من الآثار والبقع الداكنة متكررة الظهور." },
+            "static-11": { title: "صابونة اللافندر للبيكيني", price: 110, oldPrice: 150, badge: "", images: ["images/11.jpg", "", ""], desc: "مخصصة للمناطق الحساسة، تمنحكِ النظافة والانتعاش ورائحة اللافندر المهدئة.\nتركيبة مخصصة فائقة اللطف توازن درجة حموضة الجلد وتمنع التهيج والرائحة غير المرغوبة." },
+            "static-12": { title: "عنقود العنب (صغير)", price: 150, oldPrice: 190, badge: "", images: ["images/12.jpg", "", ""], desc: "تصميم لطيف ورائع بمكونات مغذية وشكل جذاب جداً كهدية أو استخدام شخصي.\nتأتي بتصميم عناقيد مبتكر ومكونات زيوت طبيعية ترطب جسمكِ وتتركه معطراً." },
+            "static-13": { title: "صابونة الألوفيرا", price: 125, oldPrice: 165, badge: "", images: ["images/13.jpg", "", ""], desc: "تهدئ البشرة المتهيجة والجافة وتوفر مرطباً طبيعياً ولطيفاً جداً.\nتحتوي على خلاصة الصبار الطبيعي لترطيب أعماق البشرة وتخفيف الاحمرار والجفاف." },
+            "static-14": { title: "صابونة الفحم النشط", price: 110, oldPrice: 150, badge: "✨ الأكثر مبيعاً", images: ["images/14.jpg", "", ""], desc: "امتصاص الدهون الزائدة وتنقية المسام بفاعلية ممتازة للبشرة الدهنية.\nتساعد في إزالة الرؤوس السوداء والشوائب العميقة وتمنع ظهور الحبوب بفاعلية." },
+            "static-15": { title: "صابونة العرقسوس", price: 110, oldPrice: 150, badge: "✨ الأكثر مبيعاً", images: ["images/15.jpg", "", ""], desc: "من أجود المكونات الطبيعية للتفتيح السريع والتخلص من التصبغات.\nتُعرف بقدرتها الفائقة على تفتيح الآثار وتوحيد لون البشرة بلمسة لطيفة وآمنة." },
+            "static-16": { title: "صابونة جوز الهند والعسل", price: 110, oldPrice: 150, badge: "", images: ["images/16.jpg", "", ""], desc: "ترطيب فائق وحماية للبشرة الجافة مع لمسة عطرية دافئة.\nتدمج بين غنى زيت جوز الهند النقية وخصائص العسل المغذية لاستعادة نعومة الجلد." },
+            "static-17": { title: "عنقود العنب (كبير)", price: 200, oldPrice: 260, badge: "", images: ["images/17.jpg", "", ""], desc: "شكل أنيق بقطعة أكبر لتدوم أطول ومجملة برائحة مميزة وحجم ممتازا.\nتضفي لمسة ديكور لطيفة على حمامكِ وتضمن لكِ استخداماً ممتعاً وممتداً برائحة فواحة." },
+            "static-18": { title: "صابونة تشيز كيك", price: 200, oldPrice: 250, badge: "", images: ["images/18.jpg", "", ""], desc: "تصميم مبتكر ورائحة شهية تعطي متعة رائعة في العناية اليومية.\nقطعة فنية تشبه التشيز كيك غنية بالمكونات المرطبة تجعل تجربة الاستحمام مميزة." },
+            "static-19": { title: "صابونة كب كيك", price: 100, oldPrice: 130, badge: "", images: ["images/19.jpg", "", ""], desc: "قطعة كب كيك لطيفة وممتعة ومغذية بالزيوت المرطبة للبشرة.\nمناسبة جداً كهدية رقيقة أو لإضافة البهجة لروتين العناية اليومية بنعومة فائقة." },
+            "static-20": { title: "صابونة ميلك شيك", price: 100, oldPrice: 130, badge: "", images: ["images/20.jpg", "", ""], desc: "تصميم لطيف برائحة حليبية ممتازة ولطيفة على الجلد.\nتغذية مركزة ببروتينات الحليب التي تمنح بشرتك نضارة واستعادة سريعة للنعومة." },
+            "static-21": { title: "سكراب الكركم للجسم", price: 125, oldPrice: 160, badge: "", images: ["images/21.jpg", "", ""], desc: "يقشر الجلد الميت ويفتح البقع مع الاستمرار لمظهر ناعم ومتوهج.\nيزيل خلايا الجلد الميتة بلطف ويساعد على توحيد لون الجسم وإعادة الإشراقة له." },
+            "static-22": { title: "سكراب القهوة للجسم", price: 125, oldPrice: 160, badge: "✨ الأكثر مبيعاً", images: ["images/22.jpg", "", ""], desc: "أفضل مقشر لتحفيز الدورة الدموية ومقاومة السيلوليت والتخلص من خشونة الجلد.\nيحتوي على حبيبات القهوة الطبيعية مع الزيوت المرطبة لإعادة التماسك والمرونة للجلد." },
+            "static-23": { title: "سكراب الفحم للجسم", price: 125, oldPrice: 160, badge: "", images: ["images/23.jpg", "", ""], desc: "ينظف المسام والجسم بعمق ويتخلص من الشوائب والسموم الجيلدية.\nمثالي للتخلص من حبوب الظهر والجسم وإعطاء شعور بالنظافة المطلقة والتعقيم." },
+            "static-24": { title: "سكراب النيلة الزرقاء", price: 125, oldPrice: 160, badge: "✨ الأكثر مبيعاً", images: ["images/24.jpg", "", ""], desc: "مقشر تفتيح قوي ومغذي يمنح الجسم نعومة ملحوظة ونضارة عالية.\nيعمل على سنفرة المناطق الداكنة بالجسم بلطف ومساعدتك في الحصول على لون موحد." },
+            "static-25": { title: "Lip Balm مرطب شفاة", price: 75, oldPrice: 100, badge: "", images: ["images/25.jpg", "", ""], desc: "يحمي الشفاه من الجفاف والتشقق مع لمسة لمعان ورائحة منعشة.\nغني بالزيوت الطبيعية وزبدة الشيا لحماية الشفاه طوال اليوم ومنحها مظهراً صحياً." },
+            "static-26": { title: "Lip Scrub مقشر شفاة", price: 75, oldPrice: 100, badge: "", images: ["images/26.jpg", "", ""], desc: "يتخلص من الجلد الميت على الشفاة لتبقى ناعمة وموردة دائماً.\nيقشر القشور الجافة بلطف وينشط الدورة الدموية في الشفاه لاستعادة لونها الطبيعي." },
+            "static-27": { title: "Sweet Sugar Body Scrub", price: 100, oldPrice: 140, badge: "", images: ["images/27.jpg", "", ""], desc: "مقشر السكر اللطيف برائحة سكرية مميزة لترطيب وتنعيم الجسم.\nيجعل حبيبات السكر اللطيفة تنساب على بشرتكِ لتقشير لطيف بدون أي تهيج." },
+            "static-28": { title: "Body Scrub Kandy", price: 200, oldPrice: 260, badge: "", images: ["images/28.jpg", "", ""], desc: "مقشر فاخر بتركيبة الغنية بالزيوت العطرية والانتعاش الفائق.\nتجربة فاخرة لتقشير الترطيب بالزيوت المنعشة مع ترك عطر حلو على جسمكِ." },
+            "static-29": { title: "توينز الكركم", price: 235, oldPrice: 310, badge: "", images: ["images/29.jpg", "", ""], desc: "مجموعة توينز الكركم المقشر والصابونة لنتائج تفتيح متكاملة.\nروتين شامل يضمن الحصول على أقصى فائدة للكركم في تنظيف وتوحيد لون البشرة." },
+            "static-30": { title: "توينز الفحم", price: 235, oldPrice: 310, badge: "⭐ عرض التوفير", images: ["images/30.jpg", "", ""], desc: "مجموعة توينز الفحم للتنظيف العميق والتخلص من الشوائب كلياً.\nتدمج بين الصابونة والمقشر للوصول إلى أعلى درجات النقاء للمسام والتنظيف الممتاز." },
+            "static-31": { title: "توينز القهوة", price: 235, oldPrice: 310, badge: "⭐ عرض التوفير", images: ["images/31.jpg", "", ""], desc: "روتين متكامل من صابونة القهوة والسكراب لتنشيط الدورة الدموية.\nمجموعة حقيقية لمقاومة السيلوليت ونعومة الجسم بخصائص القهوة الفعالة." },
+            "static-32": { title: "توينز النيلة الزرقاء", price: 235, oldPrice: 310, badge: "⭐ عرض التوفير", images: ["images/32.jpg", "", ""], desc: "العناقيد المتكاملة بالنيلة الزرقاء لتفتيح ملحوظ وملمس مخملي.\nثنائي النيلة السحري لصابون وسنفرة البشرة والتخلص الملاحظ من البقع والتصبغات." },
+            "static-33": { title: "Pure Glow Box", price: 500, oldPrice: 650, badge: "⭐ عرض التوفير", images: ["images/33.jpg", "", ""], desc: "بوكس متكامل يحتوي على أفضل المنتجات لنضارة وإشراقة لا تقاوم.\nمجموعة مختارة بعناية لمنحكِ تجربة سبا متكاملة في المنزل بسعر موفر للغاية." },
+            "static-34": { title: "عرض 4 Soap Scrub", price: 500, oldPrice: 640, badge: "⭐ عرض التوفير", images: ["images/34.jpg", "", ""], desc: "عرض موفر يحتوي على 4 قطع صابون مقشر بتشكيلات متنوعة.\nتشكيلة رائعة تجمع بين الصابون والمقشر لتجربة جميع روائح وفوائد مجموعتنا." },
+            "static-35": { title: "البوكس الجديد (5 صابونات)", price: 500, oldPrice: 625, badge: "⭐ عرض التوفير", images: ["images/35.jpg", "", ""], desc: "توليفة رائعة من 5 صابونات مختارة بعناية لجميع احتياجاتك.\nتنوع متكامل يلبي كافة متطلبات بشرتكِ وشعركِ في مجموعة واحدة توفيرية." },
+            "static-36": { title: "عرض عناقيد العنب (3 عناقيد)", price: 500, oldPrice: 600, badge: "⭐ عرض التوفير", images: ["images/36.jpg", "", ""], desc: "عرض اقتصادي قيم ومميز يحتوي على 3 عناقيد عنب بروائح خيالية.\nمجموعة العناقيد الثلاثية القيمة للترطيب الفائق ورائحة الجسم الساحرة." },
+            "static-37": { title: "Full Box for Pure Bubbles", price: 800, oldPrice: 1050, badge: "⭐ عرض التوفير", images: ["images/37.jpg", "", ""], desc: "المجموعة الشاملة والكاملة لكافة منتجات Pure Bubbles الأكثر مبيعاً.\nالبوكس الفاخر الأكبر الذي يضم المنتجات المفضلة بالكامل لتغطية روتينكِ." },
+            "static-38": { title: "Soft Rosa Collection", price: 500, oldPrice: 650, badge: "⭐ عرض التوفير", images: ["images/38.jpg", "", ""], desc: "مجموعة الورد اللطيفة بعبير الورد الانثوي الناعم لترطيب فاخر.\nتمنحكِ عبيراً أنثوياً مميزاً وترطيباً حريرياً يجعل بشرتك تتنفس نضارة." },
+            "static-39": { title: "Pure Bubbles Creamy Tint", price: 75, oldPrice: 110, badge: "⭐ عرض التوفير", images: ["images/39.jpg", "", ""], desc: "تنت كريمي طبيعي للشفاة والخدود يمنحكِ مظهر وردي جذاب ودائم.\nتركيبة كريمية سهلة الدمج تمنحكِ حمرة طبيعية وتدوم طوال اليوم دون أن تجف." }
+        };
+
+        var skinData = JSON.parse(localStorage.getItem('pure_skin_data')) || {
+            dry: [
+                { name: "صابونة الكريز وزبدة الشيا", price: 110 },
+                { name: "صابونة الأرز بالحليب والعسل", price: 125 },
+                { name: "صابونة جوز الهند والعسل", price: 110 },
+                { name: "صابونة الألوفيرا", price: 125 }
+            ],
+            oily: [
+                { name: "صابونة الفحم النشط", price: 110 },
+                { name: "صابونة القهوة", price: 110 },
+                { name: "صابونة نواة التمر", price: 125 },
+                { name: "صابونة لبان الدكر", price: 110 }
+            ],
+            sensitive: [
+                { name: "صابونة العرقسوس", price: 110 },
+                { name: "صابونة الكركم", price: 110 },
+                { name: "صابونة Signature", price: 150 },
+                { name: "صابونة جوز الهند والعسل", price: 110 }
+            ]
+        };
+
+        window.onload = function() {
+            openModal('welcome-modal');
+            applyProductsDbToUI();
+            checkAdminUIMode();
+        };
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        };
+
+        var regionsData = {
+            "القاهرة": ["مدينة نصر", "مصر الجديدة", "التجمع الخامس / القاهرة الجديدة", "المعادي", "الزمالك", "وسط البلد", "حلوان", "المقطم", "الرحاب", "مدينتي", "الزيتون", "عين شمس", "شبرا"],
+            "الجيزة": ["الدقي", "المهندسين", "الشيخ زايد", "6 أكتوبر", "الهرم", "فيصل", "حدائق الأهرام", "حدائق أكتوبر", "العجوزة", "إمبابة", "الجيزة مركز"],
+            "الفيوم": ["مدينة الفيوم", "سنورس", "طامية", "إطسا", "أبشواي", "يوسف الصديق"],
+            "الإسكندرية": ["سموحة", "ميامي", "المنتزه", "جليم", "ستانلي", "العجمي", "محرم بك", "سيدي بشر", "العامرة"],
+            "القليوبية": ["بنها", "شبرا الخيمة", "العبور", "الخانكة", "قليوب", "طوخ"],
+            "الشرقية": ["الزقازيق", "العاشر من رمضان", "بلبيس", "منيا القمح", "فاووس"],
+            "الدقهلية": ["المنصورة", "طلخا", "ميت غمر", "دكرنس", "سنبلاوين"],
+            "البحيرة": ["دمنهور", "كفر الدوار", "إيتاي البارود", "كوم حمادة"],
+            "المنوفية": ["شبين الكوم", "منوف", "أشمون", "قويسنا", "السادات"],
+            "الغربية": ["طنطا", "المحلة الكبرى", "زفتى", "سمنود"],
+            "كفر الشيخ": ["كفر الشيخ", "دسوق", "بلطيم"],
+            "دمياط": ["دمياط", "دمياط الجديدة", "رأس البر"],
+            "بورسعيد": ["حي الشرق", "حي المناخ", "حي الزهور", "بورفؤاد"],
+            "الإسماعيلية": ["مدينة الإسماعيلية", "القنطرة", "القصاصين"],
+            "السويس": ["حي السويس", "حي الأربعين", "حي الفيصل"],
+            "بني سويف": ["بني سويف", "الواسطى", "ببا"],
+            "المنيا": ["المنيا", "ملوي", "السمالوط"],
+            "أسيوط": ["أسيوط", "ديروط", "القوصية"],
+            "سوهاج": ["سوهاج", "أخميم", "طهطا"],
+            "قنا": ["قنا", "نجع حمادي", "قوص"],
+            "الأقصر": ["مدينة الأقصر", "إسنا", "أرمنت"],
+            "أسوان": ["مدينة أسوان", "كوم أمبو", "إدفو"],
+            "مطروح": ["مرسى مطروح", "العلمين", "الضبعة"],
+            "البحر الأحمر": ["الغردقة", "سفاجا", "القصير"],
+            "الوادي الجديد": ["الخارجة", "الداخلة"],
+            "شمال سيناء": ["العريش"],
+            "جنوب سيناء": ["شرم الشيخ", "دهب", "طور سيناء"]
+        };
+
+        function showToast(message) {
+            var toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.className = "show";
+            setTimeout(function(){ 
+                toast.className = toast.className.replace("show", ""); 
+            }, 2500);
+        }
+
+        function toggleSideDrawer() {
+            var drawer = document.getElementById('sideDrawer');
+            drawer.classList.toggle('open');
+        }
+
+        function toggleSubCategories() {
+            var subList = document.getElementById('subCategoriesList');
+            var arrow = document.getElementById('sub-arrow');
+            if(subList.style.display === 'flex') {
+                subList.style.display = 'none';
+                arrow.innerText = '▼';
+            } else {
+                subList.style.display = 'flex';
+                arrow.innerText = '▲';
+            }
+        }
+
+        function filterByCategory(categoryKey) {
+            toggleSideDrawer();
+            var cards = document.querySelectorAll('#productsGrid .card, #dynamicProductsGrid .card');
+            
+            var bodyItems = ["صابونة أملاح البحر الميت", "صابونة النيلة الزرقاء", "صابونة الكريز وزبدة الشيا", "صابونة القهوة", "صابونة اللافندر للبيكيني", "عنقود العنب (صغير)", "عنقود العنب (كبير)", "صابونة تشيز كيك", "صابونة كب كيك", "صابونة ميلك شيك"];
+            var hairItems = ["صابونة نواة التمر", "صابونة السدر للشعر"];
+            var faceItems = ["صابونة Signature", "صابونة الأرز بالحليب والعسل", "صابونة لبان الدكر", "صابونة الكركم", "صابونة الألوفيرا", "صابونة الفحم النشط", "صابونة العرقسوس", "صابونة جوز الهند والعسل", "Lip Balm مرطب شفاة", "Lip Scrub مقشر شفاة", "Pure Bubbles Creamy Tint"];
+            var scrubsItems = ["سكراب الكركم للجسم", "سكراب القهوة للجسم", "سكراب الفحم للجسم", "سكراب النيلة الزرقاء", "Sweet Sugar Body Scrub", "Body Scrub Kandy", "توينز الكركم", "توينز الفحم", "توينز القهوة", "توينز النيلة الزرقاء"];
+
+            cards.forEach(function(card) {
+                var title = card.querySelector('h3').innerText.trim();
+                var show = false;
+
+                if(categoryKey === 'body') {
+                    show = bodyItems.some(item => title.includes(item));
+                } else if(categoryKey === 'hair') {
+                    show = hairItems.some(item => title.includes(item));
+                } else if(categoryKey === 'face') {
+                    show = faceItems.some(item => title.includes(item));
+                } else if(categoryKey === 'scrubs') {
+                    show = scrubsItems.some(item => title.includes(item));
+                }
+
+                if(show) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+            showToast("تم تصفية المنتجات حسب القسم المختيار ✨");
+        }
+
+        function resetCategoryFilter() {
+            var cards = document.querySelectorAll('#productsGrid .card, #dynamicProductsGrid .card');
+            cards.forEach(card => card.style.display = "block");
+        }
+
+        function scrollToSection(sectionId) {
+            var elem = document.getElementById(sectionId);
+            if(elem) {
+                elem.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function filterProducts() {
+            var input = document.getElementById('searchInput').value.toLowerCase();
+            var cards = document.querySelectorAll('#productsGrid .card, #dynamicProductsGrid .card');
+            
+            cards.forEach(function(card) {
+                var title = card.querySelector('h3').innerText.toLowerCase();
+                if (title.includes(input)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        function updateRegions() {
+            var gov = document.getElementById('c-gov').value;
+            var regionSelect = document.getElementById('c-region');
+            regionSelect.innerHTML = '<option value="">اختر المنطقة/المركز</option>';
+
+            if (gov && regionsData[gov]) {
+                regionsData[gov].forEach(function(region) {
+                    var opt = document.createElement('option');
+                    opt.value = region;
+                    opt.innerText = region;
+                    regionSelect.appendChild(opt);
+                });
+            } else {
+                regionSelect.innerHTML = '<option value="">اختر المنطقة/المركز (برجاء اختيار المحافظة أولاً)</option>';
+            }
+        }
+
+        function showSkinRec(type, btnElem) {
+            if(btnElem) {
+                var btns = document.querySelectorAll('.skin-btn');
+                btns.forEach(b => b.classList.remove('active'));
+                btnElem.classList.add('active');
+            }
+
+            var container = document.getElementById('skin-recommendations');
+            var list = skinData[type];
+            var isAdmin = sessionStorage.getItem('admin_logged_in') === 'true';
+            var html = "";
+
+            if(!list || list.length === 0) {
+                container.innerHTML = "<p style='color:#888; font-size:13px;'>لا توجد منتجات مضافة في هذا القسم حالياً.</p>";
+                return;
+            }
+
+            list.forEach(function(item, idx) {
+                var deleteBtn = isAdmin ? '<button style="background:#ff4d4d; margin-left:5px;" onclick="deleteSkinProduct(\'' + type + '\', ' + idx + ')">🗑️</button>' : '';
+                html += '<div class="rec-item">' +
+                        '<span>' + item.name + ' (' + item.price + ' ج)</span>' +
+                        '<div>' + deleteBtn + '<button onclick="addToCart(\'' + item.name + '\', ' + item.price + ')">إضافة للسلة 🛍️</button></div>' +
+                        '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function openAddSkinProductModal() {
+            openModal('admin-add-skin-modal');
+        }
+
+        function saveSkinNewProduct() {
+            var type = document.getElementById('skin-target-type').value;
+            var name = document.getElementById('skin-new-name').value.trim();
+            var price = parseFloat(document.getElementById('skin-new-price').value);
+
+            if(!name || !price) {
+                alert("برجاء إدخال اسم المنتج والسعر.");
+                return;
+            }
+
+            skinData[type].push({ name: name, price: price });
+            localStorage.setItem('pure_skin_data', JSON.stringify(skinData));
+            showToast("تمت إضافة المنتج لقسم البشرة بنجاح! ✨");
+            closeModal('admin-add-skin-modal');
+            showSkinRec(type, null);
+        }
+
+        function deleteSkinProduct(type, idx) {
+            if(confirm("هل أنتِ متأكدة من حذف هذا المنتج من قسم البشرة؟")) {
+                skinData[type].splice(idx, 1);
+                localStorage.setItem('pure_skin_data', JSON.stringify(skinData));
+                showToast("تم حذف المنتج بنجاح.");
+                showSkinRec(type, null);
+            }
+        }
+
+        function addToCart(name, price) {
+            if (name.includes("Creamy Tint") || name.includes("تنت")) {
+                pendingTintPrice = price;
+                openModal('tint-modal');
+                return;
+            }
+
+            addItemToCartDirect(name, price);
+        }
+
+        function confirmTintChoice(color) {
+            var fullName = "Pure Bubbles Creamy Tint (" + color + ")";
+            addItemToCartDirect(fullName, pendingTintPrice);
+            closeModal('tint-modal');
+        }
+
+        function addItemToCartDirect(name, price) {
+            var exist = cart.find(x => x.name === name);
+            if (exist) {
+                exist.qty++;
+            } else {
+                cart.push({ name: name, price: price, qty: 1 });
+            }
+            updateCart();
+            showToast("تم إضافة " + name + " إلى السلة بنجاح! ✨");
+        }
+
+        function openProductDetails(cardId) {
+            var prod = productsDetailsDb[cardId];
+            if(!prod) return;
+
+            var newWindow = window.open('', '_blank');
+            if (!newWindow) {
+                alert("يرجى السماح بفتح النوافذ المنبثقة لعرض تفاصيل المنتج.");
+                return;
+            }
+
+            var imagesHtml = '';
+            prod.images.forEach(function(imgSrc, index) {
+                if(imgSrc && imgSrc.trim() !== "") {
+                    imagesHtml += '<img src="' + imgSrc + '" alt="' + prod.title + '" class="detail-img-' + index + '" style="width:100%; max-height:350px; object-fit:cover; border-radius:10px; margin-bottom:15px; ' + (index > 0 ? 'display:none;' : 'display:block;') + '">';
+                }
+            });
+
+            // سهم تنقل الصور في الصفحة المستقلة
+            var sliderArrows = '';
+            var validImagesCount = prod.images.filter(img => img && img.trim() !== "").length;
+            if(validImagesCount > 1) {
+                sliderArrows = '<div style="display:flex; justify-content:space-between; margin-bottom:15px;">' +
+                               '<button onclick="prevProductImg()" class="btn" style="width:48%; background:#8a2be2;">⬅️ الصورة السابقة</button>' +
+                               '<button onclick="nextProductImg()" class="btn" style="width:48%; background:#8a2be2;">الصورة التالية ➡️</button>' +
+                               '</div>' +
+                               '<script>' +
+                               'var currentImgIdx = 0;' +
+                               'var totalImgs = ' + validImagesCount + ';' +
+                               'function showImg(idx) {' +
+                               '  for(var i=0; i<totalImgs; i++) {' +
+                               '    var img = document.querySelector(".detail-img-" + i);' +
+                               '    if(img) img.style.display = (i === idx) ? "block" : "none";' +
+                               '  }' +
+                               '}' +
+                               'function nextProductImg() {' +
+                               '  currentImgIdx = (currentImgIdx + 1) % totalImgs;' +
+                               '  showImg(currentImgIdx);' +
+                               '}' +
+                               'function prevProductImg() {' +
+                               '  currentImgIdx = (currentImgIdx - 1 + totalImgs) % totalImgs;' +
+                               '  showImg(currentImgIdx);' +
+                               '}' +
+                               '<\/script>';
+            }
+
+            var pageContent = '<html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>' + prod.title + ' - Pure Bubbles</title>' +
+                '<style>body{font-family:Arial,sans-serif; background:#f9f5ff; padding:20px; text-align:center; color:#333;}' +
+                '.container{max-width:500px; margin:0 auto; background:#fff; padding:25px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.1); text-align:right;}' +
+                'h1{color:#8a2be2; font-size:22px; margin-bottom:10px;}' +
+                '.price{color:#ff007f; font-weight:bold; font-size:18px; margin:10px 0;}' +
+                '.desc{font-size:14px; color:#555; line-height:1.6; background:#f9f9f9; padding:15px; border-radius:8px; border-right:4px solid #8a2be2; margin:15px 0; white-space:pre-line;}' +
+                '.btn{background-color:#8a2be2; color:white; border:none; padding:12px; width:100%; border-radius:6px; cursor:pointer; font-weight:bold; font-size:15px; font-family:inherit; margin-top:10px;}' +
+                '.btn:hover{background-color:#711bb8;}</style></head>' +
+                '<body><div class="container">' +
+                '<button class="btn" style="background:#ff007f; margin-bottom:15px;" onclick="window.location.href=\'index.html\'">رجوع للصفحة الرئيسية</button>' +
+                imagesHtml +
+                sliderArrows +
+                '<h1>' + prod.title + '</h1>' +
+                '<div class="price">' + prod.price + ' جنيه</div>' +
+                '<div class="desc">' + prod.desc + '</div>' +
+                '<button class="btn" onclick="window.opener.addToCart(\'' + prod.title + '\', ' + prod.price + '); alert(\'تمت إضافة المنتج للسلة بنجاح! 🛍️\');">إضافة للسلة 🛍️</button>' +
+                '</div></body></html>';
+
+            newWindow.document.write(pageContent);
+            newWindow.document.close();
+        }
+
+        function openAdminEditCardModal(cardId) {
+            var prod = productsDetailsDb[cardId];
+            if(!prod) return;
+
+            document.getElementById('edit-card-id').value = cardId;
+            document.getElementById('edit-p-title').value = prod.title;
+            document.getElementById('edit-p-price').value = prod.price;
+            document.getElementById('edit-p-old-price').value = prod.oldPrice || '';
+            document.getElementById('edit-p-badge').value = prod.badge || '';
+            document.getElementById('edit-p-desc').value = prod.desc || '';
+            
+            document.getElementById('edit-p-img1-file').value = "";
+            document.getElementById('edit-p-img2-file').value = "";
+            document.getElementById('edit-p-img3-file').value = "";
+
+            openModal('admin-edit-card-modal');
+        }
+
+        function saveCardEdit() {
+            var cardId = document.getElementById('edit-card-id').value;
+            var prod = productsDetailsDb[cardId];
+            if(!prod) return;
+
+            prod.title = document.getElementById('edit-p-title').value.trim();
+            prod.price = parseFloat(document.getElementById('edit-p-price').value) || prod.price;
+            prod.oldPrice = parseFloat(document.getElementById('edit-p-old-price').value) || 0;
+            prod.badge = document.getElementById('edit-p-badge').value.trim();
+            prod.desc = document.getElementById('edit-p-desc').value.trim();
+
+            var fileInput1 = document.getElementById('edit-p-img1-file');
+            var fileInput2 = document.getElementById('edit-p-img2-file');
+            var fileInput3 = document.getElementById('edit-p-img3-file');
+
+            var filesProcessed = 0;
+            var totalFilesToProcess = 0;
+
+            if(fileInput1.files && fileInput1.files[0]) totalFilesToProcess++;
+            if(fileInput2.files && fileInput2.files[0]) totalFilesToProcess++;
+            if(fileInput3.files && fileInput3.files[0]) totalFilesToProcess++;
+
+            function checkFinish() {
+                if(filesProcessed >= totalFilesToProcess) {
+                    localStorage.setItem('pure_products_db', JSON.stringify(productsDetailsDb));
+                    applyProductsDbToUI();
+                    closeModal('admin-edit-card-modal');
+                    showToast("تم تحديث الكارت وحفظ التعديلات إلى الموقع بنجاح! ✨");
+                }
+            }
+
+            if(totalFilesToProcess === 0) {
+                localStorage.setItem('pure_products_db', JSON.stringify(productsDetailsDb));
+                applyProductsDbToUI();
+                closeModal('admin-edit-card-modal');
+                showToast("تم تحديث الكارت وحفظ التعديلات إلى الموقع بنجاح! ✨");
+                return;
+            }
+
+            if(fileInput1.files && fileInput1.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    prod.images[0] = e.target.result;
+                    filesProcessed++;
+                    checkFinish();
+                };
+                reader.readAsDataURL(fileInput1.files[0]);
+            }
+
+            if(fileInput2.files && fileInput2.files[0]) {
+                var reader2 = new FileReader();
+                reader2.onload = function(e) {
+                    prod.images[1] = e.target.result;
+                    filesProcessed++;
+                    checkFinish();
+                };
+                reader2.readAsDataURL(fileInput2.files[0]);
+            }
+
+            if(fileInput3.files && fileInput3.files[0]) {
+                var reader3 = new FileReader();
+                reader3.onload = function(e) {
+                    prod.images[2] = e.target.result;
+                    filesProcessed++;
+                    checkFinish();
+                };
+                reader3.readAsDataURL(fileInput3.files[0]);
+            }
+        }
+
+        function applyProductsDbToUI() {
+            for(var cardId in productsDetailsDb) {
+                var prod = productsDetailsDb[cardId];
+                var cardElem = document.getElementById('card-' + cardId.replace('static-', ''));
+                if(cardElem) {
+                    var imgTag = cardElem.querySelector('img');
+                    if(imgTag && prod.images[0]) {
+                        imgTag.src = prod.images[0];
+                    }
+                    var h3Tag = cardElem.querySelector('h3');
+                    if(h3Tag) h3Tag.innerText = prod.title;
+
+                    var pTag = cardElem.querySelector('p');
+                    if(pTag) {
+                        var oldPriceHtml = prod.oldPrice ? '<span class="old-price">' + prod.oldPrice + ' جنيه</span> ' : '';
+                        pTag.innerHTML = oldPriceHtml + prod.price + ' جنيه';
+                    }
+
+                    var badgeTag = cardElem.querySelector('.badge');
+                    if(prod.badge) {
+                        if(badgeTag) {
+                            badgeTag.innerText = prod.badge;
+                        } else {
+                            var newBadge = document.createElement('span');
+                            newBadge.className = 'badge';
+                            newBadge.innerText = prod.badge;
+                            cardElem.insertBefore(newBadge, cardElem.firstChild);
+                        }
+                    } else {
+                        if(badgeTag && !badgeTag.classList.contains('badge-saving')) {
+                            badgeTag.remove();
+                        }
+                    }
+                }
+            }
+        }
+
+        function changeQty(index, delta) {
+            cart[index].qty += delta;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCart();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCart();
+        }
+
+        function updateCart() {
+            var count = 0;
+            var total = 0;
+            var html = "";
+
+            cart.forEach(function(item, index) {
+                count += item.qty;
+                total += item.price * item.qty;
+                html += '<div class="cart-item">' +
+                        '<div><button class="remove-btn" onclick="removeFromCart(' + index + ')">❌</button> ' +
+                        '<span>' + item.name + '</span></div>' +
+                        '<div>' +
+                        '<button class="qty-btn" onclick="changeQty(' + index + ', -1)">-</button>' +
+                        '<span style="margin: 0 4px;">' + item.qty + '</span>' +
+                        '<button class="qty-btn" onclick="changeQty(' + index + ', 1)">+</button>' +
+                        '<span style="margin-right: 8px;">' + (item.price * item.qty) + ' ج</span>' +
+                        '</div></div>';
+            });
+
+            document.getElementById('cart-count').innerText = count;
+            document.getElementById('cart-total').innerText = total;
+            document.getElementById('cart-items').innerHTML = html || "<p style='text-align:center; color:#888;'>السلة فارغة حالياً</p>";
+        }
+
+        async function checkout() {
+            var name = document.getElementById('c-name').value.trim();
+            var phone = document.getElementById('c-phone').value.trim();
+            var gov = document.getElementById('c-gov').value;
+            var region = document.getElementById('c-region').value;
+            var address = document.getElementById('c-address').value.trim();
+
+            if (!name || !phone || !gov || !address) {
+                alert("برجاء إدخال كافة البيانات المطلوب إكمالها (الاسم، المحافظة، العنوان).");
+                return;
+            }
+
+            if (cart.length === 0) {
+                alert("السلة فارغة!");
+                return;
+            }
+
+            var trackingCode = "PB-" + Math.floor(1000 + Math.random() * 9000);
+            var fullLoc = gov + (region ? (" - " + region) : "");
+            var total = 0;
+            var itemsListText = "";
+            cart.forEach(function(item) {
+                itemsListText += "- " + item.name + " (" + item.qty + ")\n";
+                total += item.price * item.qty;
+            });
+
+            var localOrders = JSON.parse(localStorage.getItem('pure_orders_db')) || [];
+            var newOrderObj = {
+                tracking_code: trackingCode,
+                customer_name: name,
+                phone: phone,
+                address: fullLoc + " / " + address,
+                items: itemsListText,
+                total_price: total,
+                status: 'في التحضير'
+            };
+            localOrders.unshift(newOrderObj);
+            localStorage.setItem('pure_orders_db', JSON.stringify(localOrders));
+
+            if(_supabase) {
+                try {
+                    await _supabase.from('orders').insert([newOrderObj]);
+                } catch(e) {}
+            }
+
+            var msg = "طلب جديد من Pure Bubbles 🫧\n" +
+                      "🔑 كود التتبع الخاص بك: " + trackingCode + "\n\n" +
+                      "الاسم: " + name + "\nالرقم: " + phone + "\nالمحافظة والمنطقة: " + fullLoc + "\nالعنوان التفصيلي: " + address + "\n\nالطلبات:\n" +
+                      itemsListText + "\nالإجمالي: " + total + " جنيه";
+
+            window.open("https://wa.me/201021432610?text=" + encodeURIComponent(msg), "_blank");
+        }
+
+        function openModal(id) { 
+            document.getElementById(id).style.display = 'block'; 
+            if(id === 'skin-modal') {
+                showSkinRec('dry', document.querySelector('.skin-btn'));
+            }
+            if(id === 'admin-modal') {
+                loadAdminOrders();
+            }
+        }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function openWhatsApp() { window.open("https://wa.me/201021432610", "_blank"); }
+
+        async function trackOrder() {
+            var code = document.getElementById('track-code-input').value.trim().toUpperCase();
+            var resDiv = document.getElementById('track-result');
+            if(!code) { alert('أدخلي كود التتبع'); return; }
+            
+            resDiv.innerHTML = "جاري البحث عن حالة طلبك...";
+            var found = null;
+            var localOrders = JSON.parse(localStorage.getItem('pure_orders_db')) || [];
+            found = localOrders.find(o => o.tracking_code.toUpperCase() === code);
+
+            if(!found && _supabase) {
+                try {
+                    var { data } = await _supabase.from('orders').select('*').eq('tracking_code', code);
+                    if(data && data.length > 0) found = data[0];
+                } catch(e) {}
+            }
+
+            if(found) {
+                resDiv.innerHTML = "📦 حالة طلبك (" + found.tracking_code + "): <span style='color:#ff007f'>" + found.status + "</span>";
+            } else {
+                resDiv.innerHTML = "❌ لم يتم العثور على طلب بهذا الكود، تأكدي من الكود المدخل.";
+            }
+        }
+
+        // دالة تسجيل دخول الأدمن المحدثة بالباسورد المطلوب
+        function authAdmin() {
+            var pass = prompt("برجاء إدخال كلمة مرور الأدمن:");
+            if (pass === "102030") {
+                sessionStorage.setItem('admin_logged_in', 'true');
+                checkAdminUIMode();
+                openModal('admin-modal');
+            } else if (pass !== null) {
+                alert("كلمة المرور غير صحيحة!");
+            }
+        }
+
+        function checkAdminUIMode() {
+            var isAdmin = sessionStorage.getItem('admin_logged_in') === 'true';
+            var plusBtns = document.querySelectorAll('.admin-card-plus-btn');
+            var skinPlus = document.getElementById('admin-skin-plus-icon');
+
+            plusBtns.forEach(btn => {
+                btn.style.display = isAdmin ? 'flex' : 'none';
+            });
+            if(skinPlus) {
+                skinPlus.style.display = isAdmin ? 'flex' : 'none';
+            }
+        }
+
+        function showAdminTab(tabName) {
+            var ordersTab = document.getElementById('admin-orders-tab');
+            var productsTab = document.getElementById('admin-products-tab');
+            if(tabName === 'orders') {
+                ordersTab.style.display = 'block';
+                productsTab.style.display = 'none';
+                loadAdminOrders();
+            } else {
+                ordersTab.style.display = 'none';
+                productsTab.style.display = 'block';
+            }
+        }
+
+        async function loadAdminOrders() {
+            var tbody = document.getElementById('orders-table-body');
+            var localOrders = JSON.parse(localStorage.getItem('pure_orders_db')) || [];
+            var allOrders = [...localOrders];
+
+            if(_supabase) {
+                try {
+                    var { data } = await _supabase.from('orders').select('*');
+                    if(data) {
+                        data.forEach(dbOrd => {
+                            if(!allOrders.some(o => o.tracking_code === dbOrd.tracking_code)) {
+                                allOrders.push(dbOrd);
+                            }
+                        });
+                    }
+                } catch(e) {}
+            }
+
+            if(allOrders.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='6' style='text-align:center; color:#888;'>لا توجد طلبات مسجلة حتى الآن</td></tr>";
+                return;
+            }
+
+            var html = "";
+            allOrders.forEach(function(ord, index) {
+                html += "<tr>" +
+                        "<td><strong>" + ord.tracking_code + "</strong></td>" +
+                        "<td>" + ord.customer_name + "<br><small style='color:#555;'>" + ord.address + "</small></td>" +
+                        "<td>" + ord.phone + "</td>" +
+                        "<td>" + ord.total_price + " ج</td>" +
+                        "<td><span style='color:#8a2be2; font-weight:bold;'>" + (ord.status || 'في التحضير') + "</span></td>" +
+                        "<td>" +
+                        "<select onchange='updateOrderStatus(\"" + ord.tracking_code + "\", this.value)' class='form-input' style='padding:2px; font-size:11px;'>" +
+                        "<option value='في التحضير' " + (ord.status === 'في التحضير' ? 'selected' : '') + ">في التحضير</option>" +
+                        "<option value='تم الشحن' " + (ord.status === 'تم الشحن' ? 'selected' : '') + ">تم الشحن 🚚</option>" +
+                        "<option value='تم التوصيل' " + (ord.status === 'تم التوصيل' ? 'selected' : '') + ">تم التوصيل ✨</option>" +
+                        "</select>" +
+                        "</td>" +
+                        "</tr>";
+            });
+            tbody.innerHTML = html;
+        }
+
+        async function updateOrderStatus(code, newStatus) {
+            var localOrders = JSON.parse(localStorage.getItem('pure_orders_db')) || [];
+            var found = localOrders.find(o => o.tracking_code === code);
+            if(found) {
+                found.status = newStatus;
+                localStorage.setItem('pure_orders_db', JSON.stringify(localOrders));
+            }
+
+            if(_supabase) {
+                try {
+                    await _supabase.from('orders').update({ status: newStatus }).eq('tracking_code', code);
+                } catch(e) {}
+            }
+            showToast("تم تحديث حالة الطلب (" + code + ") إلى: " + newStatus);
+        }
+
+        function addNewProductFromFiles() {
+            var title = document.getElementById('p-title').value.trim();
+            var price = parseFloat(document.getElementById('p-price').value);
+            var oldPrice = parseFloat(document.getElementById('p-old-price').value) || 0;
+            var desc = document.getElementById('p-desc').value.trim();
+            var badge = document.getElementById('p-badge').value.trim();
+
+            if(!title || !price) {
+                alert("يرجى إدخال اسم المنتج والسعر الجديد على الأقل.");
+                return;
+            }
+
+            var file1 = document.getElementById('p-img1-file').files[0];
+            var file2 = document.getElementById('p-img2-file').files[0];
+            var file3 = document.getElementById('p-img3-file').files[0];
+
+            var newProdId = "dynamic-" + Date.now();
+            var imagesArr = ["", "", ""];
+
+            var processed = 0;
+            var totalToProcess = 0;
+            if(file1) totalToProcess++;
+            if(file2) totalToProcess++;
+            if(file3) totalToProcess++;
+
+            function saveAndFinish() {
+                productsDetailsDb[newProdId] = {
+                    title: title,
+                    price: price,
+                    oldPrice: oldPrice,
+                    badge: badge,
+                    images: imagesArr,
+                    desc: desc || "منتج عالي الجودة من بيور بابلز للعناية الطبيعية."
+                };
+                localStorage.setItem('pure_products_db', JSON.stringify(productsDetailsDb));
+                renderDynamicProducts();
+                closeModal('admin-modal');
+                showToast("تم إضافة المنتج الجديد للموقع بنجاح! ✨");
+
+                document.getElementById('p-title').value = "";
+                document.getElementById('p-price').value = "";
+                document.getElementById('p-old-price').value = "";
+                document.getElementById('p-desc').value = "";
+                document.getElementById('p-badge').value = "";
+                document.getElementById('p-img1-file').value = "";
+                document.getElementById('p-img2-file').value = "";
+                document.getElementById('p-img3-file').value = "";
+            }
+
+            if(totalToProcess === 0) {
+                imagesArr[0] = "images/logo.jpg";
+                saveAndFinish();
+                return;
+            }
+
+            if(file1) {
+                var r1 = new FileReader();
+                r1.onload = function(e) {
+                    imagesArr[0] = e.target.result;
+                    processed++;
+                    if(processed >= totalToProcess) saveAndFinish();
+                };
+                r1.readAsDataURL(file1);
+            }
+            if(file2) {
+                var r2 = new FileReader();
+                r2.onload = function(e) {
+                    imagesArr[1] = e.target.result;
+                    processed++;
+                    if(processed >= totalToProcess) saveAndFinish();
+                };
+                r2.readAsDataURL(file2);
+            }
+            if(file3) {
+                var r3 = new FileReader();
+                r3.onload = function(e) {
+                    imagesArr[2] = e.target.result;
+                    processed++;
+                    if(processed >= totalToProcess) saveAndFinish();
+                };
+                r3.readAsDataURL(file3);
+            }
+        }
+
+        function renderDynamicProducts() {
+            var grid = document.getElementById('dynamicProductsGrid');
+            var html = "";
+            var isAdmin = sessionStorage.getItem('admin_logged_in') === 'true';
+
+            for(var key in productsDetailsDb) {
+                if(key.startsWith('dynamic-')) {
+                    var prod = productsDetailsDb[key];
+                    var badgeHtml = prod.badge ? '<span class="badge">' + prod.badge + '</span>' : '';
+                    var oldPriceHtml = prod.oldPrice ? '<span class="old-price">' + prod.oldPrice + ' جنيه</span> ' : '';
+                    var mainImg = prod.images[0] || 'images/logo.jpg';
+                    var adminPlusBtn = isAdmin ? '<button class="admin-card-plus-btn" onclick="event.stopPropagation(); openAdminEditCardModal(\'' + key + '\')">+</button>' : '';
+
+                    html += '<div class="card" id="card-' + key + '" onclick="openProductDetails(\'' + key + '\')">' +
+                            badgeHtml +
+                            adminPlusBtn +
+                            '<img src="' + mainImg + '" alt="' + prod.title + '" loading="lazy">' +
+                            '<h3>' + prod.title + '</h3>' +
+                            '<p>' + oldPriceHtml + prod.price + ' جنيه</p>' +
+                            '<button class="btn" onclick="event.stopPropagation(); addToCart(\'' + prod.title + '\', ' + prod.price + ')">إضافة للسلة 🛍️</button>' +
+                            '</div>';
+                }
+            }
+            grid.innerHTML = html;
+        }
+
+        // استدعاء المنتجات الديناميكية عند التحميل
+        renderDynamicProducts();
+    </script>
+</body>
+</html>
